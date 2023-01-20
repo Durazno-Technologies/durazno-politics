@@ -13,8 +13,9 @@ const App = () => {
   return (
     <Routes>
       <Route path='/' element={<Pregister />} />
-      <Route path='/pre-registro' element={<Pregister />} />
+      <Route exact path='/pre-registro' element={<Pregister />} />
       <Route
+        exact
         path='/dirigente'
         element={
           <Authenticator.Provider>
@@ -23,6 +24,7 @@ const App = () => {
         }
       />
       <Route
+        exact
         path='/coordinador'
         element={
           <Authenticator.Provider>
