@@ -6,7 +6,7 @@ const Home = () => {
   return (
     <div className='container'>
       <div className='mt-24 border border-solid border-red-50'>
-        <p className='text-pink-900 text-lg font-bold'>Hola {user.attributes.name}</p>
+        <p className='text-pink-900 text-lg font-bold'>Hola {user.attributes.name} lol</p>
         <p className='text-pink-800 text-sm font-bold mt-2'>
           Da click en el boton Descargar para obtener los registros de la gente
         </p>
