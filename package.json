@@ -1,6 +1,5 @@
 {
   "name": "durazno-politics",
-  "homepage": "https://mneedomex.mx",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
