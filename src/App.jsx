@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import './index.css';
 import Pregister from './routes/pre-register';
 import CoordinadorRegister from './routes/coordinator-register';
@@ -11,7 +11,7 @@ Amplify.configure(awsconfig);
 const App = () => {
   // Use the value of authStatus to decide which page to render
   return (
-    <Routes>
+    <>
       <Route path='/' element={<Pregister />} />
       <Route exact path='/pre-registro' element={<Pregister />} />
       <Route
@@ -32,7 +32,7 @@ const App = () => {
           </Authenticator.Provider>
         }
       />
-    </Routes>
+    </>
   );
 };
 
