@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Auth } from 'aws-amplify';
 import { useNavigate } from 'react-router-dom';
 import { I18n } from 'aws-amplify';
+import ClipLoader from 'react-spinners/ClipLoader';
 import { Authenticator, useAuthenticator, translations } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import useGetAncestros from '../hooks/useGetAncestor';
@@ -135,7 +136,14 @@ const CoordinatorRegister = () => {
           )}
         </>
       ) : (
-        <div>No existen dirigentes en la base de datos</div>
+        <div className='h-screen flex justify-center items-center'>
+          <ClipLoader
+            color={'#96272d'}
+            size={50}
+            aria-label='Loading Spinner'
+            data-testid='loader'
+          />
+        </div>
       )}
     </div>
   );
