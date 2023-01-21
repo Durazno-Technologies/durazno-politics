@@ -21,7 +21,13 @@ export const getAncestors = async (role) => {
 export const getMunicipalities = async () => {
   try {
     const municipalities = await axios.get(
-      'https://mocki.io/v1/fc5f1a00-7d5c-476e-81f3-84d1fa5866ae',
+      `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/municipalities`,
+      {
+        headers: {
+          Accept: '*/*',
+          'x-api-key': process.env.REACT_APP_API_KEY,
+        },
+      },
     );
     return municipalities.data;
   } catch (e) {
@@ -32,7 +38,15 @@ export const getMunicipalities = async () => {
 
 export const getDistricts = async () => {
   try {
-    const districts = await axios.get('https://mocki.io/v1/8289a653-fce3-4651-8cdd-2dd8ff1f8eb4');
+    const districts = await axios.get(
+      `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/districts`,
+      {
+        headers: {
+          Accept: '*/*',
+          'x-api-key': process.env.REACT_APP_API_KEY,
+        },
+      },
+    );
     return districts.data;
   } catch (e) {
     console.log(e);
@@ -60,7 +74,6 @@ export const getAncestor = async (userId, jwt) => {
 };
 
 export const createAncestor = async (ancestor) => {
-  console.log(ancestor);
   try {
     const ancestorCreated = await axios.post(
       `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/ancestors`,
@@ -70,7 +83,7 @@ export const createAncestor = async (ancestor) => {
         phone: ancestor.attributes.phone_number,
         email: ancestor.attributes.email,
         role: ancestor.attributes['custom:role'],
-        ancestor: '',
+        ancestor: ancestor.attributes['custom:ancestorId'] || '',
         identifier: Math.floor(Math.random() * 9000 + 1000),
       },
       {
@@ -110,6 +123,7 @@ export const existsPhoneNumber = async (phoneNumber) => {
 };
 
 export const createUser = async (user) => {
+  console.log(user.section);
   try {
     const userCreated = await axios.post(
       `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/users`,
@@ -133,6 +147,25 @@ export const createUser = async (user) => {
       },
     );
     return userCreated;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+};
+
+export const getLeads = async (jwt) => {
+  try {
+    const leads = await axios.get(
+      `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/users/download`,
+      {
+        headers: {
+          Accept: '*/*',
+          'x-api-key': process.env.REACT_APP_API_KEY,
+          Authorization: 'Bearer ' + jwt,
+        },
+      },
+    );
+    return leads;
   } catch (e) {
     console.log(e);
     return false;

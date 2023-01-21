@@ -28,6 +28,7 @@ const preRegister = () => {
   const [selectedDistrict, setSelectedDistrict] = useState({});
   const [sections, setSections] = useState([]);
   const [selectedSection, setSelectedSection] = useState({});
+  const [hasErrors, setHasErrors] = useState(false);
 
   const {
     register,
@@ -41,6 +42,8 @@ const preRegister = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     const { fields } = { fields: data };
+
+    console.log(municipalities[0]);
 
     let led = {
       municipality: fields.municipality.label,
@@ -102,95 +105,64 @@ const preRegister = () => {
 
     const getAncestorsData = async () => {
       const ancestors = await getAncestors('Coordinador');
+
       if (!ignore) {
         setAncestors(ancestors);
       }
-      if (!ancestors) {
-        if (!ignore) {
-          toast.error('Hubo un error al cargar la pagina!', {
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'dark',
-          });
-        }
-      }
+
       setIsLoading(false);
     };
 
     const getMunicipalitiesData = async () => {
       let municipalities = await getMunicipalities();
-      if (!ignore) {
-        municipalities = municipalities
-          .map((municipality) => ({
-            ...municipality,
-            label: municipality.name,
-            value: municipality.name,
-          }))
-          .sort((a, b) => a.name.localeCompare(b.name));
-        setMunicipalities(municipalities);
-        //setSelectedMunicipality(municipalities[0]);
-        await getDistrictsData(municipalities[0]);
-      }
       if (!municipalities) {
+        console.log(municipalities);
+        setHasErrors(true);
+      } else {
         if (!ignore) {
-          toast.error('Hubo un error al cargar la pagina!', {
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'dark',
-          });
+          municipalities = municipalities
+            .map((municipality) => ({
+              ...municipality,
+              label: municipality.name,
+              value: municipality.name,
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+          setMunicipalities(municipalities);
+          //setSelectedMunicipality(municipalities[0]);
+          await getDistrictsData(municipalities[0]);
         }
       }
+
       setIsLoading(false);
     };
 
     const getDistrictsData = async (municipality) => {
       let districtsData = await getDistricts();
-
-      if (!ignore) {
-        districtsData = districtsData.map((district) => ({
-          ...district,
-          label: district.districtNumber,
-          value: district.districtNumber,
-        }));
-        //console.log(municipality);
-        //console.log(districtsData);
-        setDistricts(districtsData);
-        let municipalityDistrictsData = districtsData.filter(
-          (district) => municipality.districtIds.indexOf(district.id) >= 0,
-        );
-        setMunicipalityDistricts(municipalityDistrictsData);
-        setSelectedDistrict(municipalityDistrictsData[0]);
-        let sectionsData = municipalityDistrictsData[0].sections.map((section) => ({
-          label: section,
-          value: section,
-        }));
-        setSections(sectionsData);
-        setSelectedSection(sectionsData[0]);
-      }
       if (!districtsData) {
+        setHasErrors(true);
+      } else {
         if (!ignore) {
-          toast.error('Hubo un error al cargar la pagina!', {
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'dark',
-          });
+          districtsData = districtsData.map((district) => ({
+            ...district,
+            label: district.districtNumber,
+            value: district.districtNumber,
+          }));
+
+          setDistricts(districtsData);
+          let municipalityDistrictsData = districtsData.filter(
+            (district) => municipality.districtIds.indexOf(district.id) >= 0,
+          );
+          setMunicipalityDistricts(municipalityDistrictsData);
+          setSelectedDistrict(municipalityDistrictsData[0]);
+          let sectionsData = municipalityDistrictsData[0].sections.map((section) => ({
+            label: section,
+            value: section,
+          }));
+          setSections(sectionsData);
+          setSelectedSection(sectionsData[0]);
         }
       }
+
       setIsLoading(false);
     };
 
@@ -268,6 +240,16 @@ const preRegister = () => {
     return (
       <div className='h-screen flex justify-center items-center'>
         <ClipLoader color={'#96272d'} size={50} aria-label='Loading Spinner' data-testid='loader' />
+      </div>
+    );
+  }
+
+  if (hasErrors) {
+    return (
+      <div className='h-screen flex justify-center'>
+        <p className='mt-12 text-pink-800 text-bold'>
+          Tenemos errores comunicándonos con el servidor 😐 , favor de intentar más tarde
+        </p>
       </div>
     );
   }
@@ -369,7 +351,9 @@ const preRegister = () => {
                 <Select
                   options={sections}
                   onChange={(val) => {
-                    setSelectedSection(sections.filter((section) => section.value === val.value));
+                    setSelectedSection(
+                      sections.filter((section) => section.value === val.value)[0],
+                    );
                     field.onChange(val);
                   }}
                   isSearchable={true}
