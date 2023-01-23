@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Auth } from 'aws-amplify';
 import { useNavigate } from 'react-router-dom';
 import { I18n } from 'aws-amplify';
@@ -52,7 +53,7 @@ const DirectorRegister = () => {
         console.log(user);
         if (user.attributes['custom:role'] === 'Coordinador') {
           console.log(user);
-          navigate('/dirigente');
+          navigate('/coordinador');
         }
       }
     };
@@ -65,12 +66,20 @@ const DirectorRegister = () => {
     <div className='mt-8'>
       {authStatus === 'configuring' && 'Loading...'}
       {authStatus !== 'authenticated' ? (
-        <Authenticator
-          signUpAttributes={['name', 'phone_number', 'email']}
-          components={components}
-          formFields={formFields}
-          services={services}
-        />
+        <>
+          <div>
+            <Link to='/' className='text-pink-800 underline'>
+              Ir a inicio
+            </Link>
+          </div>
+          <Authenticator
+            signUpAttributes={['name', 'phone_number', 'email']}
+            components={components}
+            formFields={formFields}
+            services={services}
+            className='mt-8'
+          />
+        </>
       ) : (
         <Profile userProfile={userInfo} />
       )}

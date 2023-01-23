@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Auth } from 'aws-amplify';
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { I18n } from 'aws-amplify';
 import ClipLoader from 'react-spinners/ClipLoader';
@@ -105,12 +106,20 @@ const CoordinatorRegister = () => {
         <>
           {authStatus === 'configuring' && 'Loading...'}
           {authStatus !== 'authenticated' ? (
-            <Authenticator
-              signUpAttributes={['name', 'phone_number', 'email']}
-              components={components}
-              formFields={formFields}
-              services={services}
-            />
+            <>
+              <div>
+                <Link to='/' className='text-pink-800 underline'>
+                  Ir a inicio
+                </Link>
+              </div>
+              <Authenticator
+                signUpAttributes={['name', 'phone_number', 'email']}
+                components={components}
+                formFields={formFields}
+                services={services}
+                className='mt-8'
+              />
+            </>
           ) : (
             <Profile userProfile={userInfo} />
           )}

@@ -10,7 +10,6 @@ import awsconfig from './aws-exports';
 Amplify.configure(awsconfig);
 
 const App = () => {
-  // Use the value of authStatus to decide which page to render
   return (
     <Routes>
       <Route

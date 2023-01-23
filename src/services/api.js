@@ -171,3 +171,25 @@ export const getLeads = async (jwt) => {
     return false;
   }
 };
+
+export const updateAncestor = async (municipality, ancestorId, jwt) => {
+  try {
+    const ancestorUpdated = await axios.put(
+      `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/ancestors/${ancestorId}`,
+      {
+        municipality,
+      },
+      {
+        headers: {
+          Accept: 'application/json',
+          'x-api-key': process.env.REACT_APP_API_KEY,
+          Authorization: 'Bearer ' + jwt,
+        },
+      },
+    );
+    return ancestorUpdated.data;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+};

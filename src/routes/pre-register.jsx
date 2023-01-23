@@ -43,8 +43,6 @@ const preRegister = () => {
     setIsLoading(true);
     const { fields } = { fields: data };
 
-    console.log(municipalities[0]);
-
     let led = {
       municipality: fields.municipality.label,
       district: selectedDistrict.districtNumber,
