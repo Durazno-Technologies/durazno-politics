@@ -54,10 +54,10 @@ export const getDistricts = async () => {
   }
 };
 
-export const getAncestor = async (userId, jwt) => {
+export const getAncestor = async (ancestorId, jwt) => {
   try {
     const ancestor = await axios.get(
-      `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/ancestors/${userId}`,
+      `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/ancestors/${ancestorId}`,
       {
         headers: {
           Accept: 'application/json',
