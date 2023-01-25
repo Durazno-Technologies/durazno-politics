@@ -8,9 +8,9 @@ import '@aws-amplify/ui-react/styles.css';
 import useGetAncestros from '../hooks/useGetAncestor';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { components, formFields } from '../components/AuthUICoordinator';
+import { components, formFields } from '../components/AuthUIPromotor';
 import { getAncestor, createAncestor } from '../services/api';
-import CoordinatorProfile from '../components/CoordinatorProfile';
+import PromotorProfile from '../components/PromotorProfile';
 
 I18n.putVocabularies(translations);
 I18n.setLanguage('es');
@@ -22,10 +22,10 @@ I18n.putVocabularies({
   },
 });
 
-const CoordinatorRegister = () => {
+const PromotorRegister = () => {
   const { user } = useAuthenticator((context) => [context.user]);
   const { authStatus } = useAuthenticator((context) => [context.authStatus]);
-  const { ancestors } = useGetAncestros('Dirigente');
+  const { ancestors } = useGetAncestros('Coordinador');
   const [userInfo, setUserInfo] = useState({});
 
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ const CoordinatorRegister = () => {
   const services = {
     async handleSignUp(formData) {
       let { username, password, attributes } = formData;
-      attributes['custom:role'] = 'Coordinador';
+      attributes['custom:role'] = 'Promotor';
       return Auth.signUp({
         username,
         password,
@@ -46,7 +46,7 @@ const CoordinatorRegister = () => {
     async validateCustomSignUp(formData) {
       if (!formData['custom:ancestorId']) {
         return {
-          ['custom:ancestorId']: 'Tienes que ingresar el ID de tu dirigente',
+          ['custom:ancestorId']: 'Tienes que ingresar el ID de tu coordinador',
         };
       } else {
         let validAncestor = ancestors.filter(
@@ -78,9 +78,9 @@ const CoordinatorRegister = () => {
           console.log(user);
           navigate('/dirigente');
         }
-        if (user.attributes['custom:role'] === 'Promotor') {
+        if (user.attributes['custom:role'] === 'Coordinador') {
           console.log(user);
-          navigate('/promotor');
+          navigate('/coordinador');
         }
       }
     };
@@ -91,9 +91,7 @@ const CoordinatorRegister = () => {
 
   //console.log(ancestors);
 
-  useEffect(() => {
-    localStorage.setItem('alreadyLoaded', true);
-  }, []);
+  console.log(authStatus);
 
   return (
     <div className='mt-8'>
@@ -111,14 +109,7 @@ const CoordinatorRegister = () => {
       />
       {ancestors.length > 0 ? (
         <>
-          {authStatus === 'configuring' && (
-            <ClipLoader
-              color={'#96272d'}
-              size={50}
-              aria-label='Loading Spinner'
-              data-testid='loader'
-            />
-          )}
+          {authStatus === 'configuring' && 'Loading...'}
           {authStatus !== 'authenticated' ? (
             <>
               <div>
@@ -138,11 +129,10 @@ const CoordinatorRegister = () => {
                 formFields={formFields}
                 services={services}
                 className='mt-8'
-                initialState='signIn'
               />
             </>
           ) : (
-            <CoordinatorProfile userProfile={userInfo} />
+            <PromotorProfile userProfile={userInfo} />
           )}
         </>
       ) : (
@@ -159,4 +149,4 @@ const CoordinatorRegister = () => {
   );
 };
 
-export default CoordinatorRegister;
+export default PromotorRegister;

@@ -1,0 +1,317 @@
+import { useEffect, useState } from 'react';
+import { useAuthenticator } from '@aws-amplify/ui-react';
+import { getLeads, getAncestor, getMunicipalities, updateAncestor } from '../services/api';
+import { saveAs } from 'file-saver';
+import { ToastContainer, toast } from 'react-toastify';
+import ClipLoader from 'react-spinners/ClipLoader';
+import Select from 'react-select';
+import Modal from 'react-modal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
+
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    padding: '2rem',
+    height: '20rem',
+    width: '90%',
+    maxWidth: '24rem',
+  },
+};
+
+Modal.setAppElement('#root');
+
+const Profile = ({ userProfile }) => {
+  const { user, signOut } = useAuthenticator((context) => [context.user]);
+  const [leads, setLeads] = useState('');
+  const [userInfo, setUserInfo] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [modalIsOpen, setIsOpen] = useState(false);
+  const [municipalities, setMunicipalitites] = useState([]);
+  const [selectedMunicipality, setSelectedMunicipality] = useState({});
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const getLeadsData = async () => {
+      let leadsData = await getLeads(user.signInUserSession.idToken.jwtToken);
+      setLeads(leadsData);
+      return leadsData;
+    };
+
+    const getUserInfo = async () => {
+      let info = await getAncestor(user.attributes.sub, user.signInUserSession.idToken.jwtToken);
+      if (info) {
+        setUserInfo(info.data);
+      }
+    };
+    if (user) {
+      try {
+        setIsLoading(true);
+        getLeadsData();
+        if (Object.keys(userProfile).length === 0) {
+          getUserInfo();
+        } else {
+          console.log(userProfile);
+          setUserInfo(userProfile);
+        }
+        setIsLoading(false);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    setIsLoading(false);
+  }, [user]);
+
+  useEffect(() => {
+    if (Object.keys(userProfile).length > 0) {
+      setUserInfo(userProfile);
+    }
+  }, [userProfile]);
+
+  useEffect(() => {
+    const getMunicipalitiesData = async () => {
+      let municipalitiesData = await getMunicipalities();
+      municipalitiesData = municipalitiesData
+        .map((municipality) => ({
+          ...municipality,
+          label: municipality.name,
+          value: municipality.name,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      setSelectedMunicipality(municipalitiesData[0]);
+      setMunicipalitites(municipalitiesData);
+    };
+
+    getMunicipalitiesData();
+  }, []);
+
+  function _base64ToArrayBuffer(base64) {
+    var binary_string = window.atob(base64.data);
+    var len = binary_string.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) {
+      bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
+
+  const downloadXLSFile = () => {
+    const anchor_href =
+      'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + leads;
+    console.log(anchor_href);
+    const fileBlob = new Blob([_base64ToArrayBuffer(leads)], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    saveAs(fileBlob, 'registros-ciudadanos.xlsx');
+    toast.success('Archivo generado correctamente, revisa tu carpeta de descargas!', {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+    });
+  };
+
+  const updateAncestorMunicipality = async () => {
+    setIsLoading(true);
+    try {
+      const updatedAncestor = await updateAncestor(
+        selectedMunicipality.value,
+        user.attributes.sub,
+        user.signInUserSession.idToken.jwtToken,
+      );
+      setUserInfo({
+        ...userInfo,
+        municipality: updatedAncestor.municipality,
+      });
+      setIsLoading(false);
+      closeModal();
+      toast.success('Municipio guardado correctamente!', {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
+    } catch (e) {
+      setIsLoading(false);
+      toast.error('Hubo un error guardando el municipio, favor de intentar más tarde!', {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
+      console.log('hubo un error asignando el municipio');
+    }
+  };
+
+  const openModal = () => setIsOpen(!modalIsOpen);
+  const closeModal = () => setIsOpen(!modalIsOpen);
+
+  if (isLoading) {
+    return (
+      <div className='h-screen flex justify-center items-center'>
+        <ClipLoader color={'#96272d'} size={50} aria-label='Loading Spinner' data-testid='loader' />
+      </div>
+    );
+  }
+
+  console.log(user);
+
+  return (
+    <div className='container'>
+      <ToastContainer
+        position='top-right'
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme='light'
+      />
+
+      <ToastContainer />
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel='Modal Municipio'
+      >
+        <div className='flex justify-end'>
+          <button onClick={closeModal}>
+            <FontAwesomeIcon icon={faXmark} color='#9C0F48' />
+          </button>
+        </div>
+
+        <h1 className='text-pink-700'>Elige tu municipio</h1>
+        <Select
+          options={municipalities}
+          isSearchable={true}
+          defaultValue={municipalities[0]}
+          onChange={(value) => setSelectedMunicipality(value)}
+          className='mt-2'
+        />
+        <div className='mt-8 flex'>
+          <button
+            type='button'
+            className={
+              isLoading
+                ? 'inline-block w-full px-6 py-4 bg-slate-300 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-slate-600	 hover:shadow-lg focus:bg-slate-600	 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-slate-700 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+                : 'inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+            }
+            onClick={updateAncestorMunicipality}
+            disabled={isLoading}
+          >
+            Guardar Municipio
+          </button>
+        </div>
+      </Modal>
+
+      {user && Object.keys(user).length > 0 && (
+        <div className='mt-24 border border-solid border-red-50'>
+          <p className='text-pink-900 text-lg font-bold'>
+            Hola {user.attributes.name.toLocaleUpperCase()}
+          </p>
+        </div>
+      )}
+
+      {userInfo && Object.keys(userInfo).length > 0 && (
+        <>
+          <div className='mt-8'>
+            {!userInfo.municipality ? (
+              <div className='flex items-center'>
+                <p className='text-pink-800 text-sm font-bold'>Municipio:</p>
+                <button
+                  type='button'
+                  className=' ml-4 inline-block w-56 px-6 py-2 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+                  onClick={openModal}
+                >
+                  Escorger municipio
+                </button>
+              </div>
+            ) : (
+              <p className='text-pink-800 text-sm font-bold'>
+                Municipio:
+                <span className='bg-pink-800 ml-2 px-2 py-2 text-white'>
+                  {userInfo.municipality}
+                </span>
+              </p>
+            )}
+          </div>
+          <div className='mt-8'>
+            <p className='text-pink-800 text-sm font-bold'>
+              Rol:
+              <span className='bg-pink-800 ml-2 px-2 py-2 text-white'>{userInfo.role}</span>
+            </p>
+          </div>
+          <div className='mt-8'>
+            <p className='text-pink-800 text-sm font-bold'>
+              Tu identificador es el
+              <span className='bg-pink-800 ml-2 px-2 py-2 text-white'>{userInfo.identifier}</span>
+            </p>
+          </div>
+        </>
+      )}
+
+      {!leads && (
+        <div className='mt-8'>
+          <p className='text-pink-800 text-sm font-bold mt-2'>Aún no tienes registros</p>
+        </div>
+      )}
+      {leads && (
+        <div>
+          <div className='mt-8'>
+            <p className='text-pink-800 text-sm font-bold mt-2'>
+              Da click en el boton Descargar para obtener tus registros
+            </p>
+          </div>
+          <div className='mt-4 flex'>
+            <button
+              type='button'
+              onClick={downloadXLSFile}
+              className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+            >
+              Descargar registros
+            </button>
+          </div>
+        </div>
+      )}
+
+      <button
+        type='button'
+        onClick={() => {
+          signOut();
+          localStorage.setItem('alreadyLoaded', false);
+
+          setTimeout(() => {
+            navigate('/');
+          }, 500);
+        }}
+        className='mt-8 w-full inline-block px-6 py-4 bg-pink-800 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-pink-700 hover:shadow-lg focus:bg-pink-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-pink-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+      >
+        Salir
+      </button>
+    </div>
+  );
+};
+
+export default Profile;

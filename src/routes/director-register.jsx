@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Auth } from 'aws-amplify';
 import { useNavigate } from 'react-router-dom';
 import { I18n } from 'aws-amplify';
@@ -7,7 +6,7 @@ import { Authenticator, useAuthenticator, translations } from '@aws-amplify/ui-r
 import '@aws-amplify/ui-react/styles.css';
 import { components, formFields } from '../components/AuthUIDirector';
 import { getAncestor, createAncestor } from '../services/api';
-import Profile from '../components/Profile';
+import DirectorProfile from '../components/DirectorProfile';
 
 I18n.putVocabularies(translations);
 I18n.setLanguage('es');
@@ -55,6 +54,10 @@ const DirectorRegister = () => {
           console.log(user);
           navigate('/coordinador');
         }
+        if (user.attributes['custom:role'] === 'Promotor') {
+          console.log(user);
+          navigate('/promotor');
+        }
       }
     };
     if (authStatus === 'authenticated') {
@@ -62,15 +65,26 @@ const DirectorRegister = () => {
     }
   }, [authStatus]);
 
+  useEffect(() => {
+    console.log('si entra al director');
+    localStorage.setItem('alreadyLoaded', true);
+  }, []);
+
   return (
     <div className='mt-8'>
       {authStatus === 'configuring' && 'Loading...'}
       {authStatus !== 'authenticated' ? (
         <>
           <div>
-            <Link to='/' className='text-pink-800 underline'>
-              Ir a inicio
-            </Link>
+            <button
+              onClick={() => {
+                navigate('/');
+                localStorage.setItem('alreadyLoaded', false);
+              }}
+              className='underline text-blue-800'
+            >
+              Seleccionar perfil
+            </button>
           </div>
           <Authenticator
             signUpAttributes={['name', 'phone_number', 'email']}
@@ -78,10 +92,11 @@ const DirectorRegister = () => {
             formFields={formFields}
             services={services}
             className='mt-8'
+            initialState='signIn'
           />
         </>
       ) : (
-        <Profile userProfile={userInfo} />
+        <DirectorProfile userProfile={userInfo} />
       )}
     </div>
   );

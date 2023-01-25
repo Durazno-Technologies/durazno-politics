@@ -15,9 +15,35 @@ const Home = () => {
         if (user.attributes['custom:role'] === 'Coordinador') {
           navigate('/coordinador');
         }
+        if (user.attributes['custom:role'] === 'Promotor') {
+          navigate('/promotor');
+        }
       }
     }
   }, [authStatus]);
+
+  useEffect(() => {
+    //hacemos esto para forzar un reload y resetear el estado del autenticador
+    const alreadyLoaded = localStorage.getItem('alreadyLoaded');
+    if (alreadyLoaded === 'false') {
+      console.log('entra por favor');
+      localStorage.setItem('alreadyLoaded', true);
+      window.location.reload();
+    }
+    window.onpopstate = () => {
+      window.location.reload();
+    };
+  }, []);
+
+  {
+    /*if (authStatus === 'configuring') {
+    return (
+      <div className='h-screen flex justify-center items-center'>
+        <ClipLoader color={'#96272d'} size={50} aria-label='Loading Spinner' data-testid='loader' />
+      </div>
+    );
+  }*/
+  }
 
   return (
     <div className='container mt-8 flex justify-center'>
@@ -37,6 +63,13 @@ const Home = () => {
             onClick={() => navigate('/coordinador')}
           >
             Coordinador
+          </button>
+          <button
+            type='button'
+            className='mt-4 w-full inline-block px-6 py-4 bg-pink-800 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-pink-700 hover:shadow-lg focus:bg-pink-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-pink-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+            onClick={() => navigate('/promotor')}
+          >
+            Promotor
           </button>
         </div>
       </div>
