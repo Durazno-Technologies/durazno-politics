@@ -4,7 +4,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import Select from 'react-select';
 import ClipLoader from 'react-spinners/ClipLoader';
-import { getMunicipalities, getDistricts, existsPhoneNumber } from '../services/api';
+import { getMunicipalities, getDistricts, uploadFile, getAncestor } from '../services/api';
 import { ToastContainer } from 'react-toastify';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import Input from 'react-phone-number-input/input';
@@ -27,6 +27,7 @@ const RegistrarLona = () => {
   const [sections, setSections] = useState([]);
   const [selectedSection, setSelectedSection] = useState({});
   const [hasErrors, setHasErrors] = useState(false);
+  const [selectedMunicipality, setSelectedMunicipality] = useState({});
 
   const {
     register,
@@ -40,15 +41,16 @@ const RegistrarLona = () => {
     setIsLoading(true);
     const { fields } = { fields: data };
 
-    const requestObject = {
-      method: 'POST',
-      body: {
-        fileName: fields.inePicture[0].name,
-        fileType: fields.inePicture[0].type,
-      },
-    };
-
-    console.log(requestObject);
+    try {
+      const uploadedFileData = await uploadFile(
+        fields.inePicture[0].name,
+        fields.inePicture[0].type,
+        user.signInUserSession.idToken.jwtToken,
+      );
+      console.log(uploadedFileData);
+    } catch (e) {
+      console.log(e);
+    }
 
     /*fetch(
       'https://a3lreatcgbh5ugbmcy7mozqd440utiqy.lambda-url.us-east-2.on.aws/',
@@ -126,44 +128,15 @@ const RegistrarLona = () => {
             }))
             .sort((a, b) => a.name.localeCompare(b.name));
           setMunicipalities(municipalities);
-          //setSelectedMunicipality(municipalities[0]);
-          await getDistrictsData(municipalities[0]);
         }
       }
 
       setIsLoading(false);
     };
 
-    const getDistrictsData = async (municipality) => {
-      let districtsData = await getDistricts();
-      if (!districtsData) {
-        setHasErrors(true);
-      } else {
-        if (!ignore) {
-          districtsData = districtsData.map((district) => ({
-            ...district,
-            label: district.districtNumber,
-            value: district.districtNumber,
-          }));
-
-          setDistricts(districtsData);
-          let municipalityDistrictsData = districtsData.filter(
-            (district) => municipality.districtIds.indexOf(district.id) >= 0,
-          );
-          setMunicipalityDistricts(municipalityDistrictsData);
-          setSelectedDistrict(municipalityDistrictsData[0]);
-          let sectionsData = municipalityDistrictsData[0].sections.map((section) => ({
-            label: section,
-            value: section,
-          }));
-          setSections(sectionsData);
-          setSelectedSection(sectionsData[0]);
-        }
-      }
-    };
-
     if (authStatus === 'authenticated') {
       setIsLoading(true);
+      //getAncestorsData();
       getMunicipalitiesData();
       setIsLoading(false);
     }
@@ -179,15 +152,53 @@ const RegistrarLona = () => {
     }
   }, [authStatus, route]);
 
+  useEffect(() => {
+    const getDistrictsData = async (municipality) => {
+      let districtsData = await getDistricts();
+      if (!districtsData) {
+        setHasErrors(true);
+      } else {
+        districtsData = districtsData.map((district) => ({
+          ...district,
+          label: district.districtNumber,
+          value: district.districtNumber,
+        }));
+
+        setDistricts(districtsData);
+        let municipalityDistrictsData = districtsData.filter(
+          (district) => municipality.districtIds.indexOf(district.id) >= 0,
+        );
+        setMunicipalityDistricts(municipalityDistrictsData);
+        setSelectedDistrict(municipalityDistrictsData[0]);
+        let sectionsData = municipalityDistrictsData[0].sections.map((section) => ({
+          label: section,
+          value: section,
+        }));
+        setSections(sectionsData);
+        setSelectedSection(sectionsData[0]);
+      }
+    };
+
+    const getAncestorData = async () => {
+      const { data: ancestorInfo } = await getAncestor(
+        user.attributes.sub,
+        user.signInUserSession.idToken.jwtToken,
+      );
+      let ancestorMunicipality = municipalities.filter(
+        (municipality) => municipality.name === ancestorInfo.municipality,
+      )[0];
+      setSelectedMunicipality(ancestorMunicipality);
+      await getDistrictsData(ancestorMunicipality);
+    };
+
+    if (user && municipalities.length > 0) {
+      getAncestorData();
+    }
+  }, [user, municipalities]);
+
   const isAvailable = async (phoneNumber) => {
     if (isValidPhoneNumber(phoneNumber)) {
-      const existsPhone = await existsPhoneNumber(phoneNumber.slice(3));
-      if (existsPhone) {
-        setPhoneError('Este número ya ha sido ocupado para un registro');
-        return false;
-      } else {
-        return true;
-      }
+      return true;
     } else {
       setPhoneError('Favor de ingresar un número valido');
       return false;
@@ -248,49 +259,16 @@ const RegistrarLona = () => {
               className=' container max-w-xl mt-4 py-10 mt-10 px-4 border'
               onSubmit={handleSubmit(onSubmit)}
             >
-              {municipalities.length > 0 && (
+              {Object.keys(selectedMunicipality).length > 0 && (
                 <>
-                  <label className='text-gray-600 font-medium'>
-                    Municipio <span className='text-red-600'>*</span>
-                  </label>
-                  <Controller
-                    name='municipality'
-                    control={control}
-                    rules={{ required: true }}
-                    defaultValue={municipalities[0]}
-                    render={({ field }) => {
-                      return (
-                        <Select
-                          options={municipalities}
-                          onChange={(val) => {
-                            let newDistrictsMunicipality = districts
-                              .filter((district) => val.districtIds.indexOf(district.id) >= 0)
-                              .sort((a, b) => a.districtNumber - b.districtNumber);
-
-                            setMunicipalityDistricts(newDistrictsMunicipality);
-                            setSelectedDistrict(newDistrictsMunicipality[0]);
-                            let newSections = newDistrictsMunicipality[0].sections.map(
-                              (section) => ({
-                                label: section,
-                                value: section,
-                              }),
-                            );
-                            setSections(newSections);
-                            setSelectedSection(newSections[0]);
-                            field.onChange(val);
-                          }}
-                          isSearchable={true}
-                          value={municipalities.find((c) => c.value === field.value.value)}
-                          autoFocus={true}
-                        />
-                      );
-                    }}
-                  />
-                  {errors.municipality && (
-                    <div className='mb-3 text-normal text-red-500'>
-                      Favor de seleccionar un municipio
-                    </div>
-                  )}
+                  <div className='flex align-center justify-start'>
+                    <span className='flex items-center text-pink-800 text-sm font-bold'>
+                      Municipio:
+                    </span>
+                    <span className='bg-pink-800 ml-2 px-2 py-2 text- font-bold text-white text-sm '>
+                      {selectedMunicipality.name}
+                    </span>
+                  </div>
                 </>
               )}
 
@@ -458,7 +436,7 @@ const RegistrarLona = () => {
                 <div className='mb-3 text-normal text-red-500'>{errors.inePicture.message}</div>
               )}
 
-              <div className='mt-4'>
+              {/*<div className='mt-4'>
                 <label className='text-gray-600 font-medium'>
                   Foto Lona<span className='text-red-600'>*</span>
                 </label>
@@ -483,7 +461,7 @@ const RegistrarLona = () => {
 
               {errors.lonaPicture && (
                 <div className='mb-3 text-normal text-red-500'>{errors.lonaPicture.message}</div>
-              )}
+              )} */}
 
               <button
                 className={

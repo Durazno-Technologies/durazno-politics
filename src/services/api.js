@@ -101,52 +101,33 @@ export const createAncestor = async (ancestor) => {
   }
 };
 
-export const existsPhoneNumber = async (phoneNumber) => {
+export const createLead = async (lead) => {
+  console.log(lead);
   try {
-    const existsPhone = await axios.post(
-      `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/users/validatePhone`,
+    const leadCreated = await axios.post(
+      `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/leads`,
       {
-        phoneNumber,
+        municipality: lead.municipality,
+        district: lead.district,
+        section: lead.section,
+        firstName: lead.firstName,
+        lastName: lead.lastName,
+        middleName: lead.middleName,
+        address: lead.address,
+        phoneNumber: lead.phoneNumber,
+        ine: lead.ine,
+        ancestor: lead.ancestor,
+        type: lead.type,
       },
       {
         headers: {
           Accept: 'application/json',
           'x-api-key': process.env.REACT_APP_API_KEY,
+          Authorization: 'Bearer ' + lead.jwt,
         },
       },
     );
-    return existsPhone.data;
-  } catch (e) {
-    console.log(e);
-    return false;
-  }
-};
-
-export const createUser = async (user) => {
-  console.log(user.section);
-  try {
-    const userCreated = await axios.post(
-      `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/users`,
-      {
-        municipality: user.municipality,
-        district: user.district,
-        section: user.section,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        middleName: user.middleName,
-        address: user.address,
-        phoneNumber: user.phoneNumber,
-        ine: user.ine,
-        ancestor: user.ancestor,
-      },
-      {
-        headers: {
-          Accept: 'application/json',
-          'x-api-key': process.env.REACT_APP_API_KEY,
-        },
-      },
-    );
-    return userCreated;
+    return leadCreated;
   } catch (e) {
     console.log(e);
     return false;
@@ -188,6 +169,48 @@ export const updateAncestor = async (municipality, ancestorId, jwt) => {
       },
     );
     return ancestorUpdated.data;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+};
+
+export const getAncestorMunicipality = async (jwt) => {
+  try {
+    const municipality = await axios.get(
+      `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/ancestors/upline?property=municipality`,
+      {
+        headers: {
+          Accept: '*/*',
+          'x-api-key': process.env.REACT_APP_API_KEY,
+          Authorization: 'Bearer ' + jwt,
+        },
+      },
+    );
+    return municipality.data;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+};
+
+export const uploadFile = async (fileName, fileType, jwt) => {
+  try {
+    const uploadedFile = await axios.post(
+      `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/leads/upload`,
+      {
+        fileName,
+        fileType,
+      },
+      {
+        headers: {
+          Accept: 'application/json',
+          'x-api-key': process.env.REACT_APP_API_KEY,
+          Authorization: 'Bearer ' + jwt,
+        },
+      },
+    );
+    return uploadedFile.data;
   } catch (e) {
     console.log(e);
     return false;

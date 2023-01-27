@@ -4,13 +4,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import Select from 'react-select';
 import ClipLoader from 'react-spinners/ClipLoader';
-import {
-  getAncestors,
-  getMunicipalities,
-  getDistricts,
-  existsPhoneNumber,
-  createUser,
-} from '../services/api';
+import { getMunicipalities, getDistricts, createLead, getAncestor } from '../services/api';
 import { ToastContainer, toast } from 'react-toastify';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import Input from 'react-phone-number-input/input';
@@ -25,10 +19,8 @@ const RegistrarRepresentanteCalle = () => {
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [ancestors, setAncestors] = useState([]);
   const [phoneNumberError, setPhoneError] = useState('');
-  const [ancestorIdError, setAncestorIdError] = useState('');
-  const [ancestorName, setAncestorName] = useState('');
+
   const [municipalities, setMunicipalities] = useState('');
   const [municipalityDistricts, setMunicipalityDistricts] = useState([]);
   const [districts, setDistricts] = useState([]);
@@ -36,6 +28,7 @@ const RegistrarRepresentanteCalle = () => {
   const [sections, setSections] = useState([]);
   const [selectedSection, setSelectedSection] = useState({});
   const [hasErrors, setHasErrors] = useState(false);
+  const [selectedMunicipality, setSelectedMunicipality] = useState({});
 
   const {
     register,
@@ -49,9 +42,9 @@ const RegistrarRepresentanteCalle = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     const { fields } = { fields: data };
-
+    console.log(selectedMunicipality);
     let led = {
-      municipality: fields.municipality.label,
+      municipality: selectedMunicipality.value,
       district: selectedDistrict.districtNumber,
       section: selectedSection.value,
       firstName: fields.name.toUpperCase(),
@@ -60,21 +53,27 @@ const RegistrarRepresentanteCalle = () => {
       address: fields.location.label.toUpperCase(),
       phoneNumber: fields.phoneNumber.slice(3),
       ine: fields.electorIdentifier,
-      ancestor: Number(fields.idAncestor),
+      ancestor: user.attributes['custom:ancestorId'],
+      type: 'Representante de Calle',
+      jwt: user.signInUserSession.idToken.jwtToken,
     };
 
-    let ledCreated = await createUser(led);
+    let ledCreated = await createLead(led);
+    console.log(ledCreated);
     if (ledCreated) {
-      toast.success('Ciudadano agregado correctamente, ya puede revisar su whatsapp!', {
-        position: 'top-right',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
+      toast.success(
+        'Representante de calle agregado correctamente, ya puede revisar su whatsapp!',
+        {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        },
+      );
       reset({
         municipality: municipalities[0],
         district: districts[0],
@@ -83,39 +82,32 @@ const RegistrarRepresentanteCalle = () => {
         lastName: '',
         middleName: '',
         phoneNumber: '',
-        idAncestor: '',
         location: '',
         electorIdentifier: '',
       });
-      setAncestorName('');
+      // setAncestorName('');
       setIsLoading(false);
     } else {
-      toast.error('Hubo un error agregando al ciudadano, favor de intentar más tarde', {
-        position: 'top-right',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
+      console.log('Hubo un error agregando al representante de calle');
+      toast.error(
+        'Hubo un error agregando al representante de calle, favor de intentar más tarde',
+        {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        },
+      );
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
     let ignore = false;
-
-    const getAncestorsData = async () => {
-      const ancestors = await getAncestors('Coordinador');
-
-      if (!ignore) {
-        setAncestors(ancestors);
-      }
-
-      setIsLoading(false);
-    };
 
     const getMunicipalitiesData = async () => {
       let municipalities = await getMunicipalities();
@@ -132,45 +124,15 @@ const RegistrarRepresentanteCalle = () => {
             }))
             .sort((a, b) => a.name.localeCompare(b.name));
           setMunicipalities(municipalities);
-          //setSelectedMunicipality(municipalities[0]);
-          await getDistrictsData(municipalities[0]);
         }
       }
 
       setIsLoading(false);
     };
 
-    const getDistrictsData = async (municipality) => {
-      let districtsData = await getDistricts();
-      if (!districtsData) {
-        setHasErrors(true);
-      } else {
-        if (!ignore) {
-          districtsData = districtsData.map((district) => ({
-            ...district,
-            label: district.districtNumber,
-            value: district.districtNumber,
-          }));
-
-          setDistricts(districtsData);
-          let municipalityDistrictsData = districtsData.filter(
-            (district) => municipality.districtIds.indexOf(district.id) >= 0,
-          );
-          setMunicipalityDistricts(municipalityDistrictsData);
-          setSelectedDistrict(municipalityDistrictsData[0]);
-          let sectionsData = municipalityDistrictsData[0].sections.map((section) => ({
-            label: section,
-            value: section,
-          }));
-          setSections(sectionsData);
-          setSelectedSection(sectionsData[0]);
-        }
-      }
-    };
-
     if (authStatus === 'authenticated') {
       setIsLoading(true);
-      getAncestorsData();
+      //getAncestorsData();
       getMunicipalitiesData();
       setIsLoading(false);
     }
@@ -186,28 +148,65 @@ const RegistrarRepresentanteCalle = () => {
     }
   }, [authStatus, route]);
 
+  useEffect(() => {
+    const getDistrictsData = async (municipality) => {
+      let districtsData = await getDistricts();
+      if (!districtsData) {
+        setHasErrors(true);
+      } else {
+        districtsData = districtsData.map((district) => ({
+          ...district,
+          label: district.districtNumber,
+          value: district.districtNumber,
+        }));
+
+        setDistricts(districtsData);
+        let municipalityDistrictsData = districtsData.filter(
+          (district) => municipality.districtIds.indexOf(district.id) >= 0,
+        );
+        setMunicipalityDistricts(municipalityDistrictsData);
+        setSelectedDistrict(municipalityDistrictsData[0]);
+        let sectionsData = municipalityDistrictsData[0].sections.map((section) => ({
+          label: section,
+          value: section,
+        }));
+        setSections(sectionsData);
+        setSelectedSection(sectionsData[0]);
+      }
+    };
+
+    const getAncestorData = async () => {
+      const { data: ancestorInfo } = await getAncestor(
+        user.attributes.sub,
+        user.signInUserSession.idToken.jwtToken,
+      );
+      let ancestorMunicipality = municipalities.filter(
+        (municipality) => municipality.name === ancestorInfo.municipality,
+      )[0];
+      setSelectedMunicipality(ancestorMunicipality);
+      await getDistrictsData(ancestorMunicipality);
+    };
+
+    if (user && municipalities.length > 0) {
+      getAncestorData();
+    }
+  }, [user, municipalities]);
+
   const isAvailable = async (phoneNumber) => {
     if (isValidPhoneNumber(phoneNumber)) {
-      const existsPhone = await existsPhoneNumber(phoneNumber.slice(3));
-      if (existsPhone) {
-        setPhoneError('Este número ya ha sido ocupado para un registro');
-        return false;
-      } else {
-        return true;
-      }
+      return true;
     } else {
       setPhoneError('Favor de ingresar un número valido');
       return false;
     }
   };
 
-  const isValidIdAncestor = (identifier) => {
+  /*const isValidIdAncestor = (identifier) => {
     if (String(identifier).length === 4) {
       let isThereAncestor = false;
       ancestors.forEach((ancestor) => {
         if (ancestor.identifier === identifier) {
           setAncestorName(ancestor.name);
-          //console.log(ancestor.name);
           isThereAncestor = true;
         } else {
           setAncestorIdError(
@@ -220,13 +219,13 @@ const RegistrarRepresentanteCalle = () => {
       } else {
         return false;
       }
-      //console.log(ancestorsIdenfiers);
+      
     } else {
       setAncestorIdError('Favor de ingresar un identificador válido');
       setAncestorName('');
       return false;
     }
-  };
+  };*/
 
   const isValidName = (name) => {
     const regex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
@@ -292,49 +291,16 @@ const RegistrarRepresentanteCalle = () => {
               className='mb-4 container max-w-xl mt-4 py-10 mt-10 px-4 border'
               onSubmit={handleSubmit(onSubmit)}
             >
-              {municipalities.length > 0 && (
+              {Object.keys(selectedMunicipality).length > 0 && (
                 <>
-                  <label className='text-gray-600 font-medium'>
-                    Municipio <span className='text-red-600'>*</span>
-                  </label>
-                  <Controller
-                    name='municipality'
-                    control={control}
-                    rules={{ required: true }}
-                    defaultValue={municipalities[0]}
-                    render={({ field }) => {
-                      return (
-                        <Select
-                          options={municipalities}
-                          onChange={(val) => {
-                            let newDistrictsMunicipality = districts
-                              .filter((district) => val.districtIds.indexOf(district.id) >= 0)
-                              .sort((a, b) => a.districtNumber - b.districtNumber);
-
-                            setMunicipalityDistricts(newDistrictsMunicipality);
-                            setSelectedDistrict(newDistrictsMunicipality[0]);
-                            let newSections = newDistrictsMunicipality[0].sections.map(
-                              (section) => ({
-                                label: section,
-                                value: section,
-                              }),
-                            );
-                            setSections(newSections);
-                            setSelectedSection(newSections[0]);
-                            field.onChange(val);
-                          }}
-                          isSearchable={true}
-                          value={municipalities.find((c) => c.value === field.value.value)}
-                          autoFocus={true}
-                        />
-                      );
-                    }}
-                  />
-                  {errors.municipality && (
-                    <div className='mb-3 text-normal text-red-500'>
-                      Favor de seleccionar un municipio
-                    </div>
-                  )}
+                  <div className='flex align-center justify-start'>
+                    <span className='flex items-center text-pink-800 text-sm font-bold'>
+                      Municipio:
+                    </span>
+                    <span className='bg-pink-800 ml-2 px-2 py-2 text- font-bold text-white text-sm '>
+                      {selectedMunicipality.name}
+                    </span>
+                  </div>
                 </>
               )}
 
@@ -503,7 +469,7 @@ const RegistrarRepresentanteCalle = () => {
                 )}
               </div>
 
-              <div className='mt-4'>
+              {/*<div className='mt-4'>
                 <label htmlFor='phoneNumber' className='text-gray-600 font-medium'>
                   ID del Referente <span className='text-red-600'>*</span>
                 </label>
@@ -518,7 +484,7 @@ const RegistrarRepresentanteCalle = () => {
                   <div className='mb-3 text-normal text-red-500'>{ancestorIdError}</div>
                 )}
               </div>
-              {ancestorName && <p className='bg-sky-400 text-neutral-50	mt-2 p-2'>{ancestorName}</p>}
+                {ancestorName && <p className='bg-sky-400 text-neutral-50	mt-2 p-2'>{ancestorName}</p>} */}
 
               <div className='mt-4'>
                 <label className='text-gray-600 font-medium'>

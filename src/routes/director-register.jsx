@@ -49,13 +49,11 @@ const DirectorRegister = () => {
         const newAncestor = await createAncestor(user);
         setUserInfo(newAncestor.data);
       } else {
-        console.log(user);
         if (user.attributes['custom:role'] === 'Coordinador') {
           console.log(user);
           navigate('/coordinador');
         }
         if (user.attributes['custom:role'] === 'Promotor') {
-          console.log(user);
           navigate('/promotor');
         }
       }
@@ -66,7 +64,6 @@ const DirectorRegister = () => {
   }, [authStatus]);
 
   useEffect(() => {
-    console.log('si entra al director');
     localStorage.setItem('alreadyLoaded', true);
   }, []);
 

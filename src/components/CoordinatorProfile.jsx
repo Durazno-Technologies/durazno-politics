@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import { getLeads, getAncestor } from '../services/api';
+import { getLeads, getAncestor, getAncestorMunicipality, updateAncestor } from '../services/api';
 import { saveAs } from 'file-saver';
 import { ToastContainer, toast } from 'react-toastify';
 import ClipLoader from 'react-spinners/ClipLoader';
@@ -34,7 +34,6 @@ const CoordinatorProfile = ({ userProfile }) => {
         if (Object.keys(userProfile).length === 0) {
           getUserInfo();
         } else {
-          console.log(userProfile);
           setUserInfo(userProfile);
         }
         setIsLoading(false);
@@ -50,6 +49,30 @@ const CoordinatorProfile = ({ userProfile }) => {
       setUserInfo(userProfile);
     }
   }, [userProfile]);
+
+  useEffect(() => {
+    const getAncestorMunicipalityData = async () => {
+      try {
+        const municipality = await getAncestorMunicipality(user.signInUserSession.idToken.jwtToken);
+
+        if (municipality) {
+          const updatedAncestor = await updateAncestor(
+            municipality,
+            userInfo.id,
+            user.signInUserSession.idToken.jwtToken,
+          );
+          setUserInfo(updatedAncestor);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    if (Object.keys(userInfo).length > 0) {
+      if (!Object.hasOwn(userInfo, 'municipality')) {
+        getAncestorMunicipalityData();
+      }
+    }
+  }, [userInfo]);
 
   function _base64ToArrayBuffer(base64) {
     var binary_string = window.atob(base64.data);
@@ -179,7 +202,7 @@ const CoordinatorProfile = ({ userProfile }) => {
 
           setTimeout(() => {
             navigate('/');
-          }, 500);
+          }, 1000);
         }}
         className='mt-8 w-full inline-block px-6 py-4 bg-pink-800 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-pink-700 hover:shadow-lg focus:bg-pink-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-pink-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
       >

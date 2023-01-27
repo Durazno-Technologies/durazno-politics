@@ -6,8 +6,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import ClipLoader from 'react-spinners/ClipLoader';
 import Select from 'react-select';
 import Modal from 'react-modal';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
 const customStyles = {
@@ -73,6 +71,17 @@ const Profile = ({ userProfile }) => {
       setUserInfo(userProfile);
     }
   }, [userProfile]);
+
+  useEffect(() => {
+    if (Object.keys(userInfo).length > 0) {
+      if (Object.hasOwn(userInfo, 'municipality') && userInfo.municipality) {
+        console.log('Tiene municipio');
+      } else {
+        console.log('No tiene municipio');
+        setIsOpen(true);
+      }
+    }
+  }, [userInfo]);
 
   useEffect(() => {
     const getMunicipalitiesData = async () => {
@@ -161,8 +170,9 @@ const Profile = ({ userProfile }) => {
     }
   };
 
-  const openModal = () => setIsOpen(!modalIsOpen);
   const closeModal = () => setIsOpen(!modalIsOpen);
+
+  console.log(modalIsOpen);
 
   if (isLoading) {
     return (
@@ -171,8 +181,6 @@ const Profile = ({ userProfile }) => {
       </div>
     );
   }
-
-  console.log(user);
 
   return (
     <div className='container'>
@@ -190,42 +198,37 @@ const Profile = ({ userProfile }) => {
       />
 
       <ToastContainer />
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        style={customStyles}
-        contentLabel='Modal Municipio'
-      >
-        <div className='flex justify-end'>
-          <button onClick={closeModal}>
-            <FontAwesomeIcon icon={faXmark} color='#9C0F48' />
-          </button>
-        </div>
-
-        <h1 className='text-pink-700'>Elige tu municipio</h1>
-        <Select
-          options={municipalities}
-          isSearchable={true}
-          defaultValue={municipalities[0]}
-          onChange={(value) => setSelectedMunicipality(value)}
-          className='mt-2'
-        />
-        <div className='mt-8 flex'>
-          <button
-            type='button'
-            className={
-              isLoading
-                ? 'inline-block w-full px-6 py-4 bg-slate-300 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-slate-600	 hover:shadow-lg focus:bg-slate-600	 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-slate-700 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
-                : 'inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
-            }
-            onClick={updateAncestorMunicipality}
-            disabled={isLoading}
-          >
-            Guardar Municipio
-          </button>
-        </div>
-      </Modal>
-
+      {municipalities.length > 0 && (
+        <Modal
+          isOpen={modalIsOpen}
+          style={customStyles}
+          shouldCloseOnOverlayClick={false}
+          contentLabel='Modal Municipio'
+        >
+          <h1 className='text-pink-700'>Elige tu municipio</h1>
+          <Select
+            options={municipalities}
+            isSearchable={true}
+            defaultValue={municipalities[0]}
+            onChange={(value) => setSelectedMunicipality(value)}
+            className='mt-2'
+          />
+          <div className='mt-8 flex'>
+            <button
+              type='button'
+              className={
+                isLoading
+                  ? 'inline-block w-full px-6 py-4 bg-slate-300 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-slate-600	 hover:shadow-lg focus:bg-slate-600	 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-slate-700 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+                  : 'inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+              }
+              onClick={updateAncestorMunicipality}
+              disabled={isLoading}
+            >
+              Guardar Municipio
+            </button>
+          </div>
+        </Modal>
+      )}
       {user && Object.keys(user).length > 0 && (
         <div className='mt-24 border border-solid border-red-50'>
           <p className='text-pink-900 text-lg font-bold'>
@@ -236,26 +239,13 @@ const Profile = ({ userProfile }) => {
 
       {userInfo && Object.keys(userInfo).length > 0 && (
         <>
-          <div className='mt-8'>
-            {!userInfo.municipality ? (
-              <div className='flex items-center'>
-                <p className='text-pink-800 text-sm font-bold'>Municipio:</p>
-                <button
-                  type='button'
-                  className=' ml-4 inline-block w-56 px-6 py-2 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
-                  onClick={openModal}
-                >
-                  Escorger municipio
-                </button>
-              </div>
-            ) : (
-              <p className='text-pink-800 text-sm font-bold'>
-                Municipio:
-                <span className='bg-pink-800 ml-2 px-2 py-2 text-white'>
-                  {userInfo.municipality}
-                </span>
-              </p>
-            )}
+          <div className='mt-8 flex'>
+            <div className='flex align-center justify-center'>
+              <span className='flex items-center text-pink-800 text-sm font-bold'>Municipio:</span>
+              <span className='bg-pink-800 ml-2 px-2 py-2 text- font-bold text-white text-sm '>
+                {userInfo.municipality}
+              </span>
+            </div>
           </div>
           <div className='mt-8'>
             <p className='text-pink-800 text-sm font-bold'>
@@ -304,7 +294,7 @@ const Profile = ({ userProfile }) => {
 
           setTimeout(() => {
             navigate('/');
-          }, 500);
+          }, 1000);
         }}
         className='mt-8 w-full inline-block px-6 py-4 bg-pink-800 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-pink-700 hover:shadow-lg focus:bg-pink-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-pink-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
       >
