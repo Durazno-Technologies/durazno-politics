@@ -62,7 +62,16 @@ const RegistrarRepresentanteCalle = () => {
     try {
       await createLead(led);
       console.log('primero aqui');
-
+      toast.success('Representante de calle agregado correctamente!', {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
       reset({
         district: districts[0],
         section: sections[0],
@@ -76,45 +85,7 @@ const RegistrarRepresentanteCalle = () => {
       setIsLoading(false);
       console.log('despues aqui');
 
-      toast.success('Representante de calle agregado correctamente!', {
-        position: 'top-right',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
       console.log('al final aqui');
-      /*if (ledCreated) {
-        reset({
-          district: districts[0],
-          section: sections[0],
-          name: '',
-          lastName: '',
-          middleName: '',
-          phoneNumber: '',
-          location: '',
-          electorIdentifier: '',
-        });
-      } else {
-        console.log('Hubo un error agregando al representante de calle');
-        toast.error(
-          'Hubo un error agregando al representante de calle, favor de intentar más tarde',
-          {
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'light',
-          },
-        );
-        setIsLoading(false);
-      }*/
     } catch (e) {
       console.log(e);
       setIsLoading(false);
