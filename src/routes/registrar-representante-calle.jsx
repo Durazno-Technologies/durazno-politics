@@ -58,10 +58,8 @@ const RegistrarRepresentanteCalle = () => {
     };
 
     try {
-      // setIsLoading(true);
       setIsLoading(true);
       await createLead(led);
-      setIsLoading(false);
     } catch (e) {
       console.log(e);
       setIsLoading(false);
@@ -80,7 +78,7 @@ const RegistrarRepresentanteCalle = () => {
       );
     }
 
-    //setIsLoading(false);
+    setIsLoading(false);
     reset({
       district: districts[0],
       section: sections[0],
@@ -91,7 +89,7 @@ const RegistrarRepresentanteCalle = () => {
       location: '',
       electorIdentifier: '',
     });
-    toast.success('Representante de calle agregado correctamente!', {
+    /*toast.success('Representante de calle agregado correctamente!', {
       position: 'top-right',
       autoClose: 5000,
       hideProgressBar: false,
@@ -100,8 +98,8 @@ const RegistrarRepresentanteCalle = () => {
       draggable: true,
       progress: undefined,
       theme: 'light',
-    });
-    //alert('Representante de calle agregado correctamente!');
+    });*/
+    alert('Representante de calle agregado correctamente!');
   };
 
   useEffect(() => {
