@@ -35,15 +35,12 @@ const RegistrarRepresentanteCalle = () => {
     register,
     handleSubmit,
     control,
-    reset,
     formState: { errors },
   } = useForm({
     mode: 'all',
   });
   const onSubmit = async (data) => {
-    setIsLoading(true);
     const { fields } = { fields: data };
-    console.log(selectedMunicipality);
     let led = {
       municipality: selectedMunicipality.value,
       district: selectedDistrict.districtNumber,
@@ -62,6 +59,8 @@ const RegistrarRepresentanteCalle = () => {
     console.log('before try');
     try {
       console.log('before create lead');
+      setIsLoading(true);
+
       await createLead(led);
       console.log('after create lead');
       /* reset({
@@ -94,7 +93,7 @@ const RegistrarRepresentanteCalle = () => {
     console.log('after try');
 
     setIsLoading(false);
-    reset({
+    /*reset({
       district: districts[0],
       section: sections[0],
       name: '',
@@ -103,7 +102,7 @@ const RegistrarRepresentanteCalle = () => {
       phoneNumber: '',
       location: '',
       electorIdentifier: '',
-    });
+    });*/
     toast.success('Representante de calle agregado correctamente!', {
       position: 'top-right',
       autoClose: 5000,
@@ -114,8 +113,6 @@ const RegistrarRepresentanteCalle = () => {
       progress: undefined,
       theme: 'light',
     });
-
-    alert('Representante de calle agregado correctamente!');
 
     console.log('end submit');
   };
@@ -236,12 +233,16 @@ const RegistrarRepresentanteCalle = () => {
     }
   };
 
-  if (isLoading) {
+  console.log(isLoading);
+
+  {
+    /*if (isLoading) {
     return (
       <div className='h-screen flex justify-center items-center'>
         <ClipLoader color={'#96272d'} size={50} aria-label='Loading Spinner' data-testid='loader' />
       </div>
     );
+  }*/
   }
 
   if (hasErrors) {
@@ -261,8 +262,6 @@ const RegistrarRepresentanteCalle = () => {
       </div>
     );
   }
-
-  console.log('inside app');
 
   return (
     <>

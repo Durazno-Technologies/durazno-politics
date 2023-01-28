@@ -304,7 +304,18 @@ const RegistrarBarda = () => {
           <div className='container mt-8 mb-8 pb-8 bg-white rounded-md  pt-6 h-auto'>
             <Header />
 
-            <ToastContainer />
+            <ToastContainer
+              position='top-right'
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme='light'
+            />
             <h1 className='mt-8 text-orange-900 font-extrabold text-xl text-center'>
               #VamosConDelfina
             </h1>
