@@ -35,6 +35,7 @@ const RegistrarRepresentanteCalle = () => {
     register,
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm({
     mode: 'all',
@@ -93,6 +94,16 @@ const RegistrarRepresentanteCalle = () => {
     console.log('after try');
 
     setIsLoading(false);
+    reset({
+      district: districts[0],
+      section: sections[0],
+      name: '',
+      lastName: '',
+      middleName: '',
+      phoneNumber: '',
+      location: '',
+      electorIdentifier: '',
+    });
     toast.success('Representante de calle agregado correctamente!', {
       position: 'top-right',
       autoClose: 5000,
@@ -260,7 +271,18 @@ const RegistrarRepresentanteCalle = () => {
           <div className='container mt-8 bg-white rounded-md pb-8 mb-8 pt-6 h-auto'>
             <Header />
 
-            <ToastContainer />
+            <ToastContainer
+              position='top-right'
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme='light'
+            />
             <h1 className='mt-8 text-orange-900 font-extrabold text-xl text-center'>
               #VamosConDelfina
             </h1>
