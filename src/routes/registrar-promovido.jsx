@@ -210,6 +210,7 @@ const RegistrarPromovido = () => {
     );
   }
 
+  console.log(authStatus);
   if (authStatus === 'configuring') {
     return (
       <div className='h-screen flex justify-center items-center'>

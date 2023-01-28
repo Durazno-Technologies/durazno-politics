@@ -60,7 +60,7 @@ const RegistrarRepresentanteCalle = () => {
     console.log('before try');
     try {
       console.log('before create lead');
-      setIsLoading(true);
+      // setIsLoading(true);
 
       await createLead(led);
       console.log('after create lead');
@@ -93,7 +93,7 @@ const RegistrarRepresentanteCalle = () => {
     }
     console.log('after try');
 
-    setIsLoading(false);
+    //setIsLoading(false);
     reset({
       district: districts[0],
       section: sections[0],
@@ -114,7 +114,7 @@ const RegistrarRepresentanteCalle = () => {
       progress: undefined,
       theme: 'light',
     });
-    alert('Representante de calle agregado correctamente!');
+    //alert('Representante de calle agregado correctamente!');
 
     console.log('end submit');
   };
@@ -263,12 +263,14 @@ const RegistrarRepresentanteCalle = () => {
         <Navigate to='/' />
       ) : isLoading ? (
         <div className='h-screen flex justify-center items-center'>
-          <ClipLoader
-            color={'#96272d'}
-            size={50}
-            aria-label='Loading Spinner'
-            data-testid='loader'
-          />
+          <div className='h-screen flex justify-center items-center'>
+            <ClipLoader
+              color={'#96272d'}
+              size={50}
+              aria-label='Loading Spinner'
+              data-testid='loader'
+            />
+          </div>
         </div>
       ) : (
         <div className='container mt-8 bg-white rounded-md pb-8 mb-8 pt-6 h-auto'>
