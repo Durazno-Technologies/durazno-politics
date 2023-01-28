@@ -50,13 +50,24 @@ const RegistrarLona = () => {
     setIsLoading(true);
     const { fields } = { fields: data };
     try {
+      let path = fields.lonaPicture[0].name.split('/');
+      const _fileName = path.pop();
+      path = path.join('/');
+      const [fileName, fileExtension] = _fileName.split('.');
+
       const presignedLona = await uploadFile(
-        fields.lonaPicture[0].name + uuidv4(),
+        `${path}${fileName}-${uuidv4()}.${fileExtension}`,
         fields.lonaPicture[0].type,
         user.signInUserSession.idToken.jwtToken,
       );
+
+      let pathIne = fields.inePicture[0].name.split('/');
+      const _fileNameIne = pathIne.pop();
+      pathIne = pathIne.join('/');
+      const [fileNameIne, fileExtensionIne] = _fileNameIne.split('.');
+
       const presignedIne = await uploadFile(
-        fields.inePicture[0].name + uuidv4(),
+        `${pathIne}${fileNameIne}-${uuidv4()}.${fileExtensionIne}`,
         fields.inePicture[0].type,
         user.signInUserSession.idToken.jwtToken,
       );
