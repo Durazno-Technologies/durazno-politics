@@ -57,23 +57,11 @@ const RegistrarRepresentanteCalle = () => {
       jwt: user.signInUserSession.idToken.jwtToken,
     };
 
-    console.log('before try');
     try {
-      console.log('before create lead');
+      // setIsLoading(true);
       setIsLoading(true);
-
       await createLead(led);
-      console.log('after create lead');
-      /* reset({
-        district: districts[0],
-        section: sections[0],
-        name: '',
-        lastName: '',
-        middleName: '',
-        phoneNumber: '',
-        location: '',
-        electorIdentifier: '',
-      });*/
+      setIsLoading(false);
     } catch (e) {
       console.log(e);
       setIsLoading(false);
@@ -91,9 +79,8 @@ const RegistrarRepresentanteCalle = () => {
         },
       );
     }
-    console.log('after try');
 
-    setIsLoading(false);
+    //setIsLoading(false);
     reset({
       district: districts[0],
       section: sections[0],
@@ -115,8 +102,6 @@ const RegistrarRepresentanteCalle = () => {
       theme: 'light',
     });
     //alert('Representante de calle agregado correctamente!');
-
-    console.log('end submit');
   };
 
   useEffect(() => {
