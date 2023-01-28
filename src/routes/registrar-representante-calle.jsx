@@ -35,7 +35,6 @@ const RegistrarRepresentanteCalle = () => {
     register,
     handleSubmit,
     control,
-    reset,
     formState: { errors },
   } = useForm({
     mode: 'all',
@@ -60,19 +59,10 @@ const RegistrarRepresentanteCalle = () => {
     };
 
     try {
+      console.log('esto deberia ir primero');
       await createLead(led);
-      console.log('primero aqui');
-      toast.success('Representante de calle agregado correctamente!', {
-        position: 'top-right',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
-      reset({
+      console.log('esto deberia ir despues');
+      /* reset({
         district: districts[0],
         section: sections[0],
         name: '',
@@ -81,11 +71,9 @@ const RegistrarRepresentanteCalle = () => {
         phoneNumber: '',
         location: '',
         electorIdentifier: '',
-      });
+      });*/
       setIsLoading(false);
-      console.log('despues aqui');
-
-      console.log('al final aqui');
+      console.log('esto deberia ir mucho despues');
     } catch (e) {
       console.log(e);
       setIsLoading(false);
@@ -103,6 +91,17 @@ const RegistrarRepresentanteCalle = () => {
         },
       );
     }
+    toast.success('Representante de calle agregado correctamente!', {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+    });
+    console.log('esto deberia ir al final');
   };
 
   useEffect(() => {
@@ -201,32 +200,6 @@ const RegistrarRepresentanteCalle = () => {
     }
   };
 
-  /*const isValidIdAncestor = (identifier) => {
-    if (String(identifier).length === 4) {
-      let isThereAncestor = false;
-      ancestors.forEach((ancestor) => {
-        if (ancestor.identifier === identifier) {
-          setAncestorName(ancestor.name);
-          isThereAncestor = true;
-        } else {
-          setAncestorIdError(
-            'Identificador no encontrado, favor de ingresar un identificador válido',
-          );
-        }
-      });
-      if (isThereAncestor) {
-        return true;
-      } else {
-        return false;
-      }
-      
-    } else {
-      setAncestorIdError('Favor de ingresar un identificador válido');
-      setAncestorName('');
-      return false;
-    }
-  };*/
-
   const isValidName = (name) => {
     const regex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
     return regex.test(name);
@@ -246,8 +219,6 @@ const RegistrarRepresentanteCalle = () => {
       return regex.test(electorIdentifier);
     }
   };
-
-  console.log(userInfo);
 
   if (isLoading) {
     return (
@@ -274,6 +245,8 @@ const RegistrarRepresentanteCalle = () => {
       </div>
     );
   }
+
+  console.log('inside app');
 
   return (
     <>
