@@ -60,7 +60,7 @@ const RegistrarRepresentanteCalle = () => {
     console.log('before try');
     try {
       console.log('before create lead');
-      // setIsLoading(true);
+      setIsLoading(true);
 
       await createLead(led);
       console.log('after create lead');
@@ -93,7 +93,7 @@ const RegistrarRepresentanteCalle = () => {
     }
     console.log('after try');
 
-    //setIsLoading(false);
+    setIsLoading(false);
     reset({
       district: districts[0],
       section: sections[0],
@@ -261,18 +261,7 @@ const RegistrarRepresentanteCalle = () => {
     <>
       {authStatus !== 'authenticated' || user.attributes['custom:role'] === 'Dirigente' ? (
         <Navigate to='/' />
-      ) : isLoading ? (
-        <div className='h-screen flex justify-center items-center'>
-          <div className='h-screen flex justify-center items-center'>
-            <ClipLoader
-              color={'#96272d'}
-              size={50}
-              aria-label='Loading Spinner'
-              data-testid='loader'
-            />
-          </div>
-        </div>
-      ) : (
+      ) : !isLoading ? (
         <div className='container mt-8 bg-white rounded-md pb-8 mb-8 pt-6 h-auto'>
           <Header />
 
@@ -537,6 +526,15 @@ const RegistrarRepresentanteCalle = () => {
               Enviar
             </button>
           </form>
+        </div>
+      ) : (
+        <div className='h-screen flex justify-center items-center'>
+          <ClipLoader
+            color={'#96272d'}
+            size={50}
+            aria-label='Loading Spinner'
+            data-testid='loader'
+          />
         </div>
       )}
     </>
