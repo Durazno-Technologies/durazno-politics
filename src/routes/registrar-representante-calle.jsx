@@ -58,37 +58,55 @@ const RegistrarRepresentanteCalle = () => {
       jwt: user.signInUserSession.idToken.jwtToken,
     };
 
-    let ledCreated = await createLead(led);
-    console.log(ledCreated);
-    if (ledCreated) {
-      toast.success(
-        'Representante de calle agregado correctamente, ya puede revisar su whatsapp!',
-        {
-          position: 'top-right',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        },
-      );
-      reset({
-        municipality: municipalities[0],
-        district: districts[0],
-        section: sections[0],
-        name: '',
-        lastName: '',
-        middleName: '',
-        phoneNumber: '',
-        location: '',
-        electorIdentifier: '',
-      });
-      // setAncestorName('');
+    try {
+      let ledCreated = await createLead(led);
+      console.log(ledCreated);
+      if (ledCreated) {
+        toast.success(
+          'Representante de calle agregado correctamente, ya puede revisar su whatsapp!',
+          {
+            position: 'top-right',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'light',
+          },
+        );
+        reset({
+          municipality: municipalities[0],
+          district: districts[0],
+          section: sections[0],
+          name: '',
+          lastName: '',
+          middleName: '',
+          phoneNumber: '',
+          location: '',
+          electorIdentifier: '',
+        });
+        setIsLoading(false);
+      } else {
+        console.log('Hubo un error agregando al representante de calle');
+        toast.error(
+          'Hubo un error agregando al representante de calle, favor de intentar más tarde',
+          {
+            position: 'top-right',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'light',
+          },
+        );
+        setIsLoading(false);
+      }
+    } catch (e) {
+      console.log(e);
       setIsLoading(false);
-    } else {
-      console.log('Hubo un error agregando al representante de calle');
       toast.error(
         'Hubo un error agregando al representante de calle, favor de intentar más tarde',
         {
@@ -102,7 +120,6 @@ const RegistrarRepresentanteCalle = () => {
           theme: 'light',
         },
       );
-      setIsLoading(false);
     }
   };
 

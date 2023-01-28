@@ -2,10 +2,17 @@ import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuthenticator } from '@aws-amplify/ui-react';
+import { v4 as uuidv4 } from 'uuid';
 import Select from 'react-select';
 import ClipLoader from 'react-spinners/ClipLoader';
-import { getMunicipalities, getDistricts, getAncestor } from '../services/api';
-import { ToastContainer } from 'react-toastify';
+import {
+  getMunicipalities,
+  getDistricts,
+  uploadFile,
+  getAncestor,
+  createLead,
+} from '../services/api';
+import { ToastContainer, toast } from 'react-toastify';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import Input from 'react-phone-number-input/input';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
@@ -33,6 +40,7 @@ const RegistrarBarda = () => {
     register,
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm({
     mode: 'all',
@@ -40,63 +48,78 @@ const RegistrarBarda = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     const { fields } = { fields: data };
-
-    const requestObject = {
-      method: 'POST',
-      body: {
-        fileName: fields.inePicture[0].name,
-        fileType: fields.inePicture[0].type,
-      },
-    };
-
-    console.log(requestObject);
-
-    /*fetch(
-      'https://a3lreatcgbh5ugbmcy7mozqd440utiqy.lambda-url.us-east-2.on.aws/',
-      requestObject,
-    ).then((res) => {
-      console.log(res);
-      fetch(res.signedUrl, {
+    try {
+      const presignedBarda = await uploadFile(
+        fields.bardaPicture[0].name + uuidv4(),
+        fields.bardaPicture[0].type,
+        user.signInUserSession.idToken.jwtToken,
+      );
+      const presignedIne = await uploadFile(
+        fields.inePicture[0].name + uuidv4(),
+        fields.inePicture[0].type,
+        user.signInUserSession.idToken.jwtToken,
+      );
+      fetch(presignedBarda, {
         method: 'PUT',
-        body: fields.inePicture[0],
-      }).then((res) => {
-        console.log(res);
-      });
-    });*/
+        body: fields.bardaPicture[0],
+      }).then(async (barda) => {
+        fetch(presignedIne, {
+          method: 'PUT',
+          body: fields.inePicture[0],
+        }).then(async (ine) => {
+          const bardaURL = barda.url.slice(0, barda.url.search(/[?]/));
+          const ineURL = ine.url.slice(0, ine.url.search(/[?]/));
+          let led = {
+            municipality: selectedMunicipality.value,
+            district: selectedDistrict.districtNumber,
+            section: selectedSection.value,
+            address: fields.location.label.toUpperCase(),
+            phoneNumber: fields.phoneNumber.slice(3),
+            ine: fields.electorIdentifier,
+            ancestor: user.attributes['custom:ancestorId'],
+            type: 'Barda',
+            jwt: user.signInUserSession.idToken.jwtToken,
+            bardaPicture: bardaURL,
+            inePicture: ineURL,
+          };
 
-    /*let led = {
-      municipality: fields.municipality.label,
-      district: selectedDistrict.districtNumber,
-      section: selectedSection.value,
-      address: fields.location.label.toUpperCase(),
-      phoneNumber: fields.phoneNumber.slice(3),
-      ine: fields.electorIdentifier,
-    };
-
-    let ledCreated = await createUser(led);
-    if (ledCreated) {
-      toast.success('Lona agregada correctamente!', {
-        position: 'top-right',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
+          let ledCreated = await createLead(led);
+          console.log(ledCreated);
+          if (ledCreated) {
+            toast.success('Barda agregada correctamente!', {
+              position: 'top-right',
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: 'light',
+            });
+            reset({
+              district: districts[0],
+              section: sections[0],
+              phoneNumber: '',
+              location: '',
+              electorIdentifier: '',
+            });
+          } else {
+            toast.error('Hubo un error agregando la barda, favor de intentar más tarde', {
+              position: 'top-right',
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: 'light',
+            });
+          }
+        });
       });
-      reset({
-        municipality: municipalities[0],
-        district: districts[0],
-        section: sections[0],
-        phoneNumber: '',
-        location: '',
-        electorIdentifier: '',
-      });
-      setAncestorName('');
+    } catch (e) {
       setIsLoading(false);
-    } else {
-      toast.error('Hubo un error agregando la lona, favor de intentar más tarde', {
+      toast.error('Hubo un error agregando la barda, favor de intentar más tarde', {
         position: 'top-right',
         autoClose: 5000,
         hideProgressBar: false,
@@ -105,7 +128,10 @@ const RegistrarBarda = () => {
         draggable: true,
         progress: undefined,
         theme: 'light',
-      });*/
+      });
+      console.log(e);
+    }
+
     setIsLoading(false);
   };
 
@@ -244,6 +270,15 @@ const RegistrarBarda = () => {
     <>
       {authStatus !== 'authenticated' || user.attributes['custom:role'] === 'Dirigente' ? (
         <Navigate to='/' />
+      ) : isLoading ? (
+        <div className='h-screen flex justify-center items-center'>
+          <ClipLoader
+            color={'#96272d'}
+            size={50}
+            aria-label='Loading Spinner'
+            data-testid='loader'
+          />
+        </div>
       ) : (
         <>
           <div className='container mt-8 mb-8 pb-8 bg-white rounded-md  pt-6 h-auto'>
@@ -437,10 +472,10 @@ const RegistrarBarda = () => {
 
               <div className='mt-4'>
                 <label className='text-gray-600 font-medium'>
-                  Foto Lona<span className='text-red-600'>*</span>
+                  Foto Barda<span className='text-red-600'>*</span>
                 </label>
                 <input
-                  {...register('lonaPicture', {
+                  {...register('bardaPicture', {
                     required: true,
                     validate: {
                       lessThan10MB: (files) =>
@@ -454,12 +489,12 @@ const RegistrarBarda = () => {
                   type='file'
                 />
               </div>
-              {errors?.lonaPicture?.type === 'required' && (
+              {errors?.bardaPicture?.type === 'required' && (
                 <div className='mb-3 text-normal text-red-500'>Favor de seleccionar una imagen</div>
               )}
 
-              {errors.lonaPicture && (
-                <div className='mb-3 text-normal text-red-500'>{errors.lonaPicture.message}</div>
+              {errors.bardaPicture && (
+                <div className='mb-3 text-normal text-red-500'>{errors.bardaPicture.message}</div>
               )}
 
               <button

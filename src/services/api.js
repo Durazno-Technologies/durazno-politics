@@ -102,7 +102,6 @@ export const createAncestor = async (ancestor) => {
 };
 
 export const createLead = async (lead) => {
-  console.log(lead);
   try {
     const leadCreated = await axios.post(
       `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/leads`,
@@ -118,6 +117,10 @@ export const createLead = async (lead) => {
         ine: lead.ine,
         ancestor: lead.ancestor,
         type: lead.type,
+        lonaPicture: lead.lonaPicture,
+        inePicture: lead.inePicture,
+        bardaPicture: lead.bardaPicture,
+        peopleVoting: lead.peopleVoting,
       },
       {
         headers: {
@@ -134,10 +137,10 @@ export const createLead = async (lead) => {
   }
 };
 
-export const getLeads = async (jwt) => {
+export const getLeads = async (jwt, typeLead) => {
   try {
     const leads = await axios.get(
-      `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/users/download`,
+      `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/leads/download?type=${typeLead}`,
       {
         headers: {
           Accept: '*/*',

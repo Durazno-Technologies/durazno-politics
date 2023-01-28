@@ -4,8 +4,8 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import Select from 'react-select';
 import ClipLoader from 'react-spinners/ClipLoader';
-import { getMunicipalities, getDistricts, getAncestor } from '../services/api';
-import { ToastContainer } from 'react-toastify';
+import { getMunicipalities, getDistricts, getAncestor, createLead } from '../services/api';
+import { ToastContainer, toast } from 'react-toastify';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import Input from 'react-phone-number-input/input';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
@@ -33,61 +33,67 @@ const RegistrarPromovido = () => {
     register,
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm({
     mode: 'all',
   });
   const onSubmit = async (data) => {
-    //setIsLoading(true);
+    const { fields } = { fields: data };
 
-    console.log(data);
-
-    /*fetch(
-      'https://a3lreatcgbh5ugbmcy7mozqd440utiqy.lambda-url.us-east-2.on.aws/',
-      requestObject,
-    ).then((res) => {
-      console.log(res);
-      fetch(res.signedUrl, {
-        method: 'PUT',
-        body: fields.inePicture[0],
-      }).then((res) => {
-        console.log(res);
-      });
-    });*/
-
-    /*let led = {
-      municipality: fields.municipality.label,
+    let led = {
+      municipality: selectedMunicipality.value,
       district: selectedDistrict.districtNumber,
       section: selectedSection.value,
       address: fields.location.label.toUpperCase(),
-      phoneNumber: fields.phoneNumber.slice(3),
-      ine: fields.electorIdentifier,
+      phoneNumber: fields.phoneNumber ? fields.phoneNumber.slice(3) : undefined,
+      peopleVoting: fields.peopleVoting,
+      type: 'Promovido',
+      ancestor: user.attributes['custom:ancestorId'],
+      jwt: user.signInUserSession.idToken.jwtToken,
     };
 
-    let ledCreated = await createUser(led);
-    if (ledCreated) {
-      toast.success('Lona agregada correctamente!', {
-        position: 'top-right',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
-      reset({
-        municipality: municipalities[0],
-        district: districts[0],
-        section: sections[0],
-        phoneNumber: '',
-        location: '',
-        electorIdentifier: '',
-      });
-      setAncestorName('');
+    try {
+      setIsLoading(true);
+
+      let ledCreated = await createLead(led);
+      if (ledCreated) {
+        toast.success('Promovido agregado correctamente!', {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        });
+        reset({
+          municipality: municipalities[0],
+          district: districts[0],
+          section: sections[0],
+          phoneNumber: '',
+          location: '',
+          electorIdentifier: '',
+        });
+        setIsLoading(false);
+      } else {
+        toast.error('Hubo un error agregando al promovido, favor de intentar más tarde', {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        });
+        setIsLoading(false);
+      }
+    } catch (e) {
       setIsLoading(false);
-    } else {
-      toast.error('Hubo un error agregando la lona, favor de intentar más tarde', {
+
+      toast.error('Hubo un error agregando al promovido, favor de intentar más tarde', {
         position: 'top-right',
         autoClose: 5000,
         hideProgressBar: false,
@@ -96,8 +102,8 @@ const RegistrarPromovido = () => {
         draggable: true,
         progress: undefined,
         theme: 'light',
-      });*/
-    setIsLoading(false);
+      });
+    }
   };
 
   useEffect(() => {

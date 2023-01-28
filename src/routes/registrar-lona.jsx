@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import { v4 as uuidv4 } from 'uuid';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import Select from 'react-select';
 import ClipLoader from 'react-spinners/ClipLoader';
-import { getMunicipalities, getDistricts, uploadFile, getAncestor } from '../services/api';
-import { ToastContainer } from 'react-toastify';
+import {
+  getMunicipalities,
+  getDistricts,
+  uploadFile,
+  getAncestor,
+  createLead,
+} from '../services/api';
+import { ToastContainer, toast } from 'react-toastify';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import Input from 'react-phone-number-input/input';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
@@ -33,6 +40,7 @@ const RegistrarLona = () => {
     register,
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm({
     mode: 'all',
@@ -40,63 +48,77 @@ const RegistrarLona = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     const { fields } = { fields: data };
-
     try {
-      const uploadedFileData = await uploadFile(
-        fields.inePicture[0].name,
+      const presignedLona = await uploadFile(
+        fields.lonaPicture[0].name + uuidv4(),
+        fields.lonaPicture[0].type,
+        user.signInUserSession.idToken.jwtToken,
+      );
+      const presignedIne = await uploadFile(
+        fields.inePicture[0].name + uuidv4(),
         fields.inePicture[0].type,
         user.signInUserSession.idToken.jwtToken,
       );
-      console.log(uploadedFileData);
-    } catch (e) {
-      console.log(e);
-    }
-
-    /*fetch(
-      'https://a3lreatcgbh5ugbmcy7mozqd440utiqy.lambda-url.us-east-2.on.aws/',
-      requestObject,
-    ).then((res) => {
-      console.log(res);
-      fetch(res.signedUrl, {
+      fetch(presignedLona, {
         method: 'PUT',
-        body: fields.inePicture[0],
-      }).then((res) => {
-        console.log(res);
-      });
-    });*/
+        body: fields.lonaPicture[0],
+      }).then(async (lona) => {
+        fetch(presignedIne, {
+          method: 'PUT',
+          body: fields.inePicture[0],
+        }).then(async (ine) => {
+          const lonaURL = lona.url.slice(0, lona.url.search(/[?]/));
+          const ineURL = ine.url.slice(0, ine.url.search(/[?]/));
+          let led = {
+            municipality: selectedMunicipality.value,
+            district: selectedDistrict.districtNumber,
+            section: selectedSection.value,
+            address: fields.location.label.toUpperCase(),
+            phoneNumber: fields.phoneNumber.slice(3),
+            ine: fields.electorIdentifier,
+            ancestor: user.attributes['custom:ancestorId'],
+            type: 'Lona',
+            jwt: user.signInUserSession.idToken.jwtToken,
+            lonaPicture: lonaURL,
+            inePicture: ineURL,
+          };
 
-    /*let led = {
-      municipality: fields.municipality.label,
-      district: selectedDistrict.districtNumber,
-      section: selectedSection.value,
-      address: fields.location.label.toUpperCase(),
-      phoneNumber: fields.phoneNumber.slice(3),
-      ine: fields.electorIdentifier,
-    };
-
-    let ledCreated = await createUser(led);
-    if (ledCreated) {
-      toast.success('Lona agregada correctamente!', {
-        position: 'top-right',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
+          let ledCreated = await createLead(led);
+          console.log(ledCreated);
+          if (ledCreated) {
+            toast.success('Lona agregada correctamente!', {
+              position: 'top-right',
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: 'light',
+            });
+            reset({
+              district: districts[0],
+              section: sections[0],
+              phoneNumber: '',
+              location: '',
+              electorIdentifier: '',
+            });
+          } else {
+            toast.error('Hubo un error agregando la lona, favor de intentar más tarde', {
+              position: 'top-right',
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: 'light',
+            });
+          }
+        });
       });
-      reset({
-        municipality: municipalities[0],
-        district: districts[0],
-        section: sections[0],
-        phoneNumber: '',
-        location: '',
-        electorIdentifier: '',
-      });
-      setAncestorName('');
+    } catch (e) {
       setIsLoading(false);
-    } else {
       toast.error('Hubo un error agregando la lona, favor de intentar más tarde', {
         position: 'top-right',
         autoClose: 5000,
@@ -106,7 +128,11 @@ const RegistrarLona = () => {
         draggable: true,
         progress: undefined,
         theme: 'light',
-      });*/
+      });
+
+      console.log(e);
+    }
+
     setIsLoading(false);
   };
 
@@ -245,6 +271,15 @@ const RegistrarLona = () => {
     <>
       {authStatus !== 'authenticated' || user.attributes['custom:role'] === 'Dirigente' ? (
         <Navigate to='/' />
+      ) : isLoading ? (
+        <div className='h-screen flex justify-center items-center'>
+          <ClipLoader
+            color={'#96272d'}
+            size={50}
+            aria-label='Loading Spinner'
+            data-testid='loader'
+          />
+        </div>
       ) : (
         <>
           <div className='container mt-8 mb-8 pb-8 bg-white rounded-md  pt-6 h-auto'>
@@ -436,7 +471,7 @@ const RegistrarLona = () => {
                 <div className='mb-3 text-normal text-red-500'>{errors.inePicture.message}</div>
               )}
 
-              {/*<div className='mt-4'>
+              <div className='mt-4'>
                 <label className='text-gray-600 font-medium'>
                   Foto Lona<span className='text-red-600'>*</span>
                 </label>
@@ -461,7 +496,7 @@ const RegistrarLona = () => {
 
               {errors.lonaPicture && (
                 <div className='mb-3 text-normal text-red-500'>{errors.lonaPicture.message}</div>
-              )} */}
+              )}
 
               <button
                 className={
