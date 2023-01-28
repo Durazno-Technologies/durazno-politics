@@ -9,18 +9,42 @@ import Header from './Header';
 
 const CoordinatorProfile = ({ userProfile }) => {
   const { user, signOut } = useAuthenticator((context) => [context.user]);
-  const [leads, setLeads] = useState('');
   const [userInfo, setUserInfo] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const [representantesLeads, setRepresentantesLeads] = useState('');
+  const [lonasLeads, setLonasLeads] = useState('');
+  const [bardasLeads, setBardasLeads] = useState('');
+  const [promovidosLeads, setPromovidosLeads] = useState('');
+
   useEffect(() => {
     const getLeadsData = async () => {
-      let leadsData = await getLeads(user.signInUserSession.idToken.jwtToken);
-      setLeads(leadsData);
-      return leadsData;
-    };
+      let repreLeadsData = await getLeads(
+        user.signInUserSession.idToken.jwtToken,
+        'Representante de Calle',
+      );
+      if (repreLeadsData) {
+        setRepresentantesLeads(repreLeadsData);
+      }
+      let lonasLeadsData = await getLeads(user.signInUserSession.idToken.jwtToken, 'Lona');
+      if (lonasLeadsData) {
+        setLonasLeads(lonasLeadsData);
+      }
+      let bardasLeadsData = await getLeads(user.signInUserSession.idToken.jwtToken, 'Barda');
 
+      if (bardasLeadsData) {
+        setBardasLeads(bardasLeadsData);
+      }
+
+      let promovidosLeadsData = await getLeads(
+        user.signInUserSession.idToken.jwtToken,
+        'Promovido',
+      );
+      if (promovidosLeads) {
+        setPromovidosLeads(promovidosLeadsData);
+      }
+    };
     const getUserInfo = async () => {
       let info = await getAncestor(user.attributes.sub, user.signInUserSession.idToken.jwtToken);
       if (info) {
@@ -84,14 +108,11 @@ const CoordinatorProfile = ({ userProfile }) => {
     return bytes.buffer;
   }
 
-  const downloadXLSFile = () => {
-    const anchor_href =
-      'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + leads;
-    console.log(anchor_href);
+  const downloadXLSFile = (leads, name) => {
     const fileBlob = new Blob([_base64ToArrayBuffer(leads)], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
-    saveAs(fileBlob, 'registros-ciudadanos.xlsx');
+    saveAs(fileBlob, `${name}.xlsx`);
     toast.success('Archivo generado correctamente, revisa tu carpeta de descargas!', {
       position: 'top-right',
       autoClose: 5000,
@@ -103,7 +124,6 @@ const CoordinatorProfile = ({ userProfile }) => {
       theme: 'light',
     });
   };
-
   if (isLoading) {
     return (
       <div className='h-screen flex justify-center items-center'>
@@ -113,7 +133,7 @@ const CoordinatorProfile = ({ userProfile }) => {
   }
 
   return (
-    <div className='container'>
+    <div className='container mb-8'>
       <Header />
 
       <ToastContainer
@@ -170,12 +190,14 @@ const CoordinatorProfile = ({ userProfile }) => {
         </>
       )}
 
-      {!leads && (
+      {!representantesLeads && (
         <div className='mt-8'>
-          <p className='text-pink-800 text-sm font-bold mt-2'>Aún no tienes registros</p>
+          <p className='text-pink-800 text-sm font-bold mt-2'>
+            Aún no tienes registros de Representantes de Calle
+          </p>
         </div>
       )}
-      {leads && (
+      {representantesLeads && (
         <div>
           <div className='mt-8'>
             <p className='text-pink-800 text-sm font-bold mt-2'>
@@ -185,10 +207,92 @@ const CoordinatorProfile = ({ userProfile }) => {
           <div className='mt-4 flex'>
             <button
               type='button'
-              onClick={downloadXLSFile}
+              onClick={() => {
+                downloadXLSFile(representantesLeads, 'Representantes de Calle');
+              }}
               className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
             >
-              Descargar registros
+              Descargar Representantes de Calles
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!lonasLeads && (
+        <div className='mt-8'>
+          <p className='text-pink-800 text-sm font-bold mt-2 '>Aún no tienes registros de Lonas</p>
+        </div>
+      )}
+      {lonasLeads && (
+        <div>
+          <div className='mt-8'>
+            <p className='text-pink-800 text-sm font-bold mt-2'>
+              Da click en el boton Descargar para obtener tus registros
+            </p>
+          </div>
+          <div className='mt-4 flex'>
+            <button
+              type='button'
+              onClick={() => {
+                downloadXLSFile(lonasLeads, 'Lonas');
+              }}
+              className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+            >
+              Descargar Lonas
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!bardasLeads && (
+        <div className='mt-8'>
+          <p className='text-pink-800 text-sm font-bold mt-2'>Aún no tienes registros de Bardas</p>
+        </div>
+      )}
+      {bardasLeads && (
+        <div>
+          <div className='mt-8'>
+            <p className='text-pink-800 text-sm font-bold mt-2'>
+              Da click en el boton Descargar para obtener tus registros
+            </p>
+          </div>
+          <div className='mt-4 flex'>
+            <button
+              type='button'
+              onClick={() => {
+                downloadXLSFile(bardasLeads, 'Bardas');
+              }}
+              className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+            >
+              Descargar Bardas
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!promovidosLeads && (
+        <div className='mt-8'>
+          <p className='text-pink-800 text-sm font-bold mt-2'>
+            Aún no tienes registros de Promovidos
+          </p>
+        </div>
+      )}
+      {promovidosLeads && (
+        <div>
+          <div className='mt-8'>
+            <p className='text-pink-800 text-sm font-bold mt-2'>
+              Da click en el boton Descargar para obtener tus registros
+            </p>
+          </div>
+          <div className='mt-4 flex'>
+            <button
+              type='button'
+              onClick={() => {
+                downloadXLSFile(promovidosLeads, 'Promovidos');
+              }}
+              className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+            >
+              Descargar Promovidos
             </button>
           </div>
         </div>

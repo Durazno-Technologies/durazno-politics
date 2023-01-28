@@ -29,6 +29,7 @@ const RegistrarRepresentanteCalle = () => {
   const [selectedSection, setSelectedSection] = useState({});
   const [hasErrors, setHasErrors] = useState(false);
   const [selectedMunicipality, setSelectedMunicipality] = useState({});
+  const [userInfo, setUserInfo] = useState({});
 
   const {
     register,
@@ -53,7 +54,7 @@ const RegistrarRepresentanteCalle = () => {
       address: fields.location.label.toUpperCase(),
       phoneNumber: fields.phoneNumber.slice(3),
       ine: fields.electorIdentifier,
-      ancestor: user.attributes['custom:ancestorId'],
+      ancestor: userInfo.identifier,
       type: 'Representante de Calle',
       jwt: user.signInUserSession.idToken.jwtToken,
     };
@@ -76,7 +77,6 @@ const RegistrarRepresentanteCalle = () => {
           },
         );
         reset({
-          municipality: municipalities[0],
           district: districts[0],
           section: sections[0],
           name: '',
@@ -197,6 +197,7 @@ const RegistrarRepresentanteCalle = () => {
         user.attributes.sub,
         user.signInUserSession.idToken.jwtToken,
       );
+      setUserInfo(ancestorInfo);
       let ancestorMunicipality = municipalities.filter(
         (municipality) => municipality.name === ancestorInfo.municipality,
       )[0];
@@ -263,6 +264,8 @@ const RegistrarRepresentanteCalle = () => {
       return regex.test(electorIdentifier);
     }
   };
+
+  console.log(userInfo);
 
   if (isLoading) {
     return (

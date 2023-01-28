@@ -35,6 +35,7 @@ const RegistrarLona = () => {
   const [selectedSection, setSelectedSection] = useState({});
   const [hasErrors, setHasErrors] = useState(false);
   const [selectedMunicipality, setSelectedMunicipality] = useState({});
+  const [userInfo, setUserInfo] = useState({});
 
   const {
     register,
@@ -76,7 +77,7 @@ const RegistrarLona = () => {
             address: fields.location.label.toUpperCase(),
             phoneNumber: fields.phoneNumber.slice(3),
             ine: fields.electorIdentifier,
-            ancestor: user.attributes['custom:ancestorId'],
+            ancestor: userInfo.identifier,
             type: 'Lona',
             jwt: user.signInUserSession.idToken.jwtToken,
             lonaPicture: lonaURL,
@@ -210,6 +211,8 @@ const RegistrarLona = () => {
         user.attributes.sub,
         user.signInUserSession.idToken.jwtToken,
       );
+      setUserInfo(ancestorInfo);
+
       let ancestorMunicipality = municipalities.filter(
         (municipality) => municipality.name === ancestorInfo.municipality,
       )[0];

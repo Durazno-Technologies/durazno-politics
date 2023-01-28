@@ -28,6 +28,7 @@ const RegistrarPromovido = () => {
   const [selectedSection, setSelectedSection] = useState({});
   const [hasErrors, setHasErrors] = useState(false);
   const [selectedMunicipality, setSelectedMunicipality] = useState({});
+  const [userInfo, setUserInfo] = useState({});
 
   const {
     register,
@@ -49,7 +50,7 @@ const RegistrarPromovido = () => {
       phoneNumber: fields.phoneNumber ? fields.phoneNumber.slice(3) : undefined,
       peopleVoting: fields.peopleVoting,
       type: 'Promovido',
-      ancestor: user.attributes['custom:ancestorId'],
+      ancestor: userInfo.identifier,
       jwt: user.signInUserSession.idToken.jwtToken,
     };
 
@@ -180,6 +181,7 @@ const RegistrarPromovido = () => {
         user.attributes.sub,
         user.signInUserSession.idToken.jwtToken,
       );
+      setUserInfo(ancestorInfo);
       let ancestorMunicipality = municipalities.filter(
         (municipality) => municipality.name === ancestorInfo.municipality,
       )[0];

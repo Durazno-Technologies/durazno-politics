@@ -13,6 +13,9 @@ const PromotorProfile = ({ userProfile }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [representantesLeads, setRepresentantesLeads] = useState('');
+  const [lonasLeads, setLonasLeads] = useState('');
+  const [bardasLeads, setBardasLeads] = useState('');
+  const [promovidosLeads, setPromovidosLeads] = useState('');
 
   useEffect(() => {
     const getLeadsData = async () => {
@@ -20,8 +23,26 @@ const PromotorProfile = ({ userProfile }) => {
         user.signInUserSession.idToken.jwtToken,
         'Representante de Calle',
       );
-      setRepresentantesLeads(repreLeadsData);
-      return repreLeadsData;
+      if (repreLeadsData) {
+        setRepresentantesLeads(repreLeadsData);
+      }
+      let lonasLeadsData = await getLeads(user.signInUserSession.idToken.jwtToken, 'Lona');
+      if (lonasLeadsData) {
+        setLonasLeads(lonasLeadsData);
+      }
+      let bardasLeadsData = await getLeads(user.signInUserSession.idToken.jwtToken, 'Barda');
+
+      if (bardasLeadsData) {
+        setBardasLeads(bardasLeadsData);
+      }
+
+      let promovidosLeadsData = await getLeads(
+        user.signInUserSession.idToken.jwtToken,
+        'Promovido',
+      );
+      if (promovidosLeads) {
+        setPromovidosLeads(promovidosLeadsData);
+      }
     };
 
     const getUserInfo = async () => {
@@ -87,14 +108,11 @@ const PromotorProfile = ({ userProfile }) => {
     return bytes.buffer;
   }
 
-  const downloadXLSFile = (leadsData, nameLead) => {
-    const anchor_href =
-      'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + leadsData;
-    console.log(anchor_href);
-    const fileBlob = new Blob([_base64ToArrayBuffer(leadsData)], {
+  const downloadXLSFile = (leads, name) => {
+    const fileBlob = new Blob([_base64ToArrayBuffer(leads)], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
-    saveAs(fileBlob, `${nameLead}.xlsx`);
+    saveAs(fileBlob, `${name}.xlsx`);
     toast.success('Archivo generado correctamente, revisa tu carpeta de descargas!', {
       position: 'top-right',
       autoClose: 5000,
@@ -116,7 +134,7 @@ const PromotorProfile = ({ userProfile }) => {
   }
 
   return (
-    <div className='container'>
+    <div className='container mb-8'>
       <Header />
       <ToastContainer
         position='top-right'
@@ -168,7 +186,7 @@ const PromotorProfile = ({ userProfile }) => {
 
       {!representantesLeads && (
         <div className='mt-8'>
-          <p className='text-pink-800 text-sm font-bold mt-2 text-center'>
+          <p className='text-pink-800 text-sm font-bold mt-2'>
             Aún no tienes registros de Representantes de Calle
           </p>
         </div>
@@ -184,11 +202,91 @@ const PromotorProfile = ({ userProfile }) => {
             <button
               type='button'
               onClick={() => {
-                downloadXLSFile(representantesLeads, 'Representantes de Calles');
+                downloadXLSFile(representantesLeads, 'Representantes de Calle');
               }}
               className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
             >
-              Descargar registros
+              Descargar Representantes de Calles
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!lonasLeads && (
+        <div className='mt-8'>
+          <p className='text-pink-800 text-sm font-bold mt-2 '>Aún no tienes registros de Lonas</p>
+        </div>
+      )}
+      {lonasLeads && (
+        <div>
+          <div className='mt-8'>
+            <p className='text-pink-800 text-sm font-bold mt-2'>
+              Da click en el boton Descargar para obtener tus registros
+            </p>
+          </div>
+          <div className='mt-4 flex'>
+            <button
+              type='button'
+              onClick={() => {
+                downloadXLSFile(lonasLeads, 'Lonas');
+              }}
+              className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+            >
+              Descargar Lonas
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!bardasLeads && (
+        <div className='mt-8'>
+          <p className='text-pink-800 text-sm font-bold mt-2'>Aún no tienes registros de Bardas</p>
+        </div>
+      )}
+      {bardasLeads && (
+        <div>
+          <div className='mt-8'>
+            <p className='text-pink-800 text-sm font-bold mt-2'>
+              Da click en el boton Descargar para obtener tus registros
+            </p>
+          </div>
+          <div className='mt-4 flex'>
+            <button
+              type='button'
+              onClick={() => {
+                downloadXLSFile(bardasLeads, 'Bardas');
+              }}
+              className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+            >
+              Descargar Bardas
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!promovidosLeads && (
+        <div className='mt-8'>
+          <p className='text-pink-800 text-sm font-bold mt-2'>
+            Aún no tienes registros de Promovidos
+          </p>
+        </div>
+      )}
+      {promovidosLeads && (
+        <div>
+          <div className='mt-8'>
+            <p className='text-pink-800 text-sm font-bold mt-2'>
+              Da click en el boton Descargar para obtener tus registros
+            </p>
+          </div>
+          <div className='mt-4 flex'>
+            <button
+              type='button'
+              onClick={() => {
+                downloadXLSFile(promovidosLeads, 'Promovidos');
+              }}
+              className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+            >
+              Descargar Promovidos
             </button>
           </div>
         </div>
