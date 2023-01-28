@@ -134,6 +134,7 @@ const RegistrarLona = () => {
 
       console.log(e);
     }
+    setIsLoading(false);
 
     toast.success('Lona agregada correctamente!', {
       position: 'top-right',
@@ -145,8 +146,6 @@ const RegistrarLona = () => {
       progress: undefined,
       theme: 'light',
     });
-
-    setIsLoading(false);
   };
 
   useEffect(() => {

@@ -95,6 +95,7 @@ const RegistrarPromovido = () => {
       });
     }
 
+    setIsLoading(false);
     toast.success('Promovido agregado correctamente!', {
       position: 'top-right',
       autoClose: 5000,
@@ -105,7 +106,6 @@ const RegistrarPromovido = () => {
       progress: undefined,
       theme: 'light',
     });
-    setIsLoading(false);
   };
 
   useEffect(() => {

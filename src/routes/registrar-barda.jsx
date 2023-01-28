@@ -133,6 +133,7 @@ const RegistrarBarda = () => {
       });
       console.log(e);
     }
+    setIsLoading(false);
     toast.success('Barda agregada correctamente!', {
       position: 'top-right',
       autoClose: 5000,
@@ -143,7 +144,6 @@ const RegistrarBarda = () => {
       progress: undefined,
       theme: 'light',
     });
-    setIsLoading(false);
   };
 
   useEffect(() => {

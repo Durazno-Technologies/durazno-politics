@@ -63,19 +63,6 @@ const RegistrarRepresentanteCalle = () => {
       let ledCreated = await createLead(led);
       console.log(ledCreated);
       if (ledCreated) {
-        toast.success(
-          'Representante de calle agregado correctamente, ya puede revisar su whatsapp!',
-          {
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'light',
-          },
-        );
         reset({
           district: districts[0],
           section: sections[0],
@@ -86,7 +73,6 @@ const RegistrarRepresentanteCalle = () => {
           location: '',
           electorIdentifier: '',
         });
-        setIsLoading(false);
       } else {
         console.log('Hubo un error agregando al representante de calle');
         toast.error(
@@ -121,6 +107,17 @@ const RegistrarRepresentanteCalle = () => {
         },
       );
     }
+    setIsLoading(false);
+    toast.success('Representante de calle agregado correctamente!', {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+    });
   };
 
   useEffect(() => {
