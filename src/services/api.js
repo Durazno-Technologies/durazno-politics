@@ -138,6 +138,7 @@ export const createLead = async (lead) => {
 };
 
 export const getLeads = async (jwt, typeLead) => {
+  console.log(typeLead);
   try {
     const leads = await axios.get(
       `${process.env.REACT_APP_AMAZON_URL}/${process.env.REACT_APP_STAGE}/leads/download?type=${typeLead}`,
