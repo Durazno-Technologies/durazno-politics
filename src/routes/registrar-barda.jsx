@@ -104,6 +104,8 @@ const RegistrarBarda = () => {
             electorIdentifier: '',
           });
           setIsLoading(false);
+          alert('Barda agregada correctamente!');
+
           toast.success('Barda agregada correctamente!', {
             position: 'top-right',
             autoClose: 5000,

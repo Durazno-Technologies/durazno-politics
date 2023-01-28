@@ -77,6 +77,7 @@ const RegistrarPromovido = () => {
         progress: undefined,
         theme: 'light',
       });
+      alert('Promovido agregado correctamente!');
     } catch (e) {
       setIsLoading(false);
       toast.error('Hubo un error agregando al promovido, favor de intentar más tarde', {

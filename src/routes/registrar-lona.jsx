@@ -118,6 +118,8 @@ const RegistrarLona = () => {
             progress: undefined,
             theme: 'light',
           });
+          alert('Lona agregada correctamente!');
+
           console.log('y por ultimo este');
           /*if (ledCreated) {
             reset({
