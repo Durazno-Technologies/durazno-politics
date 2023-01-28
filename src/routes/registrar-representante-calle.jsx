@@ -35,6 +35,7 @@ const RegistrarRepresentanteCalle = () => {
     register,
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm({
     mode: 'all',
@@ -93,7 +94,7 @@ const RegistrarRepresentanteCalle = () => {
     console.log('after try');
 
     setIsLoading(false);
-    /*reset({
+    reset({
       district: districts[0],
       section: sections[0],
       name: '',
@@ -102,7 +103,7 @@ const RegistrarRepresentanteCalle = () => {
       phoneNumber: '',
       location: '',
       electorIdentifier: '',
-    });*/
+    });
     toast.success('Representante de calle agregado correctamente!', {
       position: 'top-right',
       autoClose: 5000,
@@ -113,6 +114,7 @@ const RegistrarRepresentanteCalle = () => {
       progress: undefined,
       theme: 'light',
     });
+    alert('Representante de calle agregado correctamente!');
 
     console.log('end submit');
   };
@@ -244,6 +246,8 @@ const RegistrarRepresentanteCalle = () => {
       </div>
     );
   }
+
+  console.log(authStatus);
 
   if (authStatus === 'configuring') {
     return (
