@@ -1,8 +1,12 @@
 import { useState } from 'react'; // import state
 import { NavLink, Link } from 'react-router-dom';
+import { useAuthenticator } from '@aws-amplify/ui-react';
+import { useNavigate } from 'react-router-dom';
+
 export default function Header() {
   const [isNavOpen, setIsNavOpen] = useState(false); // initiate isNavOpen state with false
-
+  const { signOut } = useAuthenticator((context) => [context.user]);
+  const navigate = useNavigate();
   return (
     <div className='flex items-center justify-between border-b border-gray-400 py-8'>
       <Link to='/'>
@@ -88,6 +92,20 @@ export default function Header() {
                   Registrar Promovido
                 </NavLink>
               </li>
+              <li className='my-8 uppercase'>
+                <button
+                  onClick={() => {
+                    signOut();
+                    localStorage.setItem('alreadyLoaded', false);
+
+                    setTimeout(() => {
+                      navigate('/');
+                    }, 1000);
+                  }}
+                >
+                  SALIR
+                </button>
+              </li>
             </ul>
           </div>
         </section>
@@ -143,6 +161,18 @@ export default function Header() {
               Registrar Promovido
             </NavLink>
           </li>
+          <button
+            onClick={() => {
+              signOut();
+              localStorage.setItem('alreadyLoaded', false);
+
+              setTimeout(() => {
+                navigate('/');
+              }, 1000);
+            }}
+          >
+            SALIR
+          </button>
         </ul>
       </nav>
       <style>{`

@@ -50,13 +50,24 @@ const RegistrarBarda = () => {
     setIsLoading(true);
     const { fields } = { fields: data };
     try {
+      let path = fields.bardaPicture[0].name.split('/');
+      const _fileName = path.pop();
+      path = path.join('/');
+      const [fileName, fileExtension] = _fileName.split('.');
+
       const presignedBarda = await uploadFile(
-        fields.bardaPicture[0].name + uuidv4(),
+        `${path}${fileName}-${uuidv4()}.${fileExtension}`,
         fields.bardaPicture[0].type,
         user.signInUserSession.idToken.jwtToken,
       );
+
+      let pathIne = fields.bardaPicture[0].name.split('/');
+      const _fileNameIne = pathIne.pop();
+      pathIne = pathIne.join('/');
+      const [fileNameIne, fileExtensionIne] = _fileNameIne.split('.');
+
       const presignedIne = await uploadFile(
-        fields.inePicture[0].name + uuidv4(),
+        `${pathIne}${fileNameIne}-${uuidv4()}.${fileExtensionIne}`,
         fields.inePicture[0].type,
         user.signInUserSession.idToken.jwtToken,
       );
@@ -66,7 +77,7 @@ const RegistrarBarda = () => {
       }).then(async (barda) => {
         fetch(presignedIne, {
           method: 'PUT',
-          body: fields.inePicture[0],
+          body: fields.bardaPicture[0],
         }).then(async (ine) => {
           const bardaURL = barda.url.slice(0, barda.url.search(/[?]/));
           const ineURL = ine.url.slice(0, ine.url.search(/[?]/));
@@ -87,16 +98,6 @@ const RegistrarBarda = () => {
           let ledCreated = await createLead(led);
           console.log(ledCreated);
           if (ledCreated) {
-            toast.success('Barda agregada correctamente!', {
-              position: 'top-right',
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: 'light',
-            });
             reset({
               district: districts[0],
               section: sections[0],
@@ -132,7 +133,16 @@ const RegistrarBarda = () => {
       });
       console.log(e);
     }
-
+    toast.success('Barda agregada correctamente!', {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+    });
     setIsLoading(false);
   };
 
@@ -287,12 +297,12 @@ const RegistrarBarda = () => {
             <Header />
 
             <ToastContainer />
-            <h1 className='mt-8 text-orange-900 font-extrabold text-3xl text-center'>
+            <h1 className='mt-8 text-orange-900 font-extrabold text-xl text-center'>
               #VamosConDelfina
             </h1>
-            <h3 className='text-red-800	font-extrabold text-xl text-center mt-2'>Registro</h3>
+            <h3 className='text-red-800	font-extrabold text-lg text-center mt-2'>Registro</h3>
             <form
-              className=' container max-w-xl mt-4 py-10 mt-10 px-4 border'
+              className=' container max-w-xl mt-4 mb-12 py-10 mt-10 px-4 border'
               onSubmit={handleSubmit(onSubmit)}
             >
               {Object.keys(selectedMunicipality).length > 0 && (
@@ -445,7 +455,7 @@ const RegistrarBarda = () => {
                 )}
               </div>
 
-              <div className='mt-4'>
+              <div className='mt-4 flex flex-col'>
                 <label className='text-gray-600 font-medium'>
                   Foto INE <span className='text-red-600'>*</span>
                 </label>
@@ -472,7 +482,7 @@ const RegistrarBarda = () => {
                 <div className='mb-3 text-normal text-red-500'>{errors.inePicture.message}</div>
               )}
 
-              <div className='mt-4'>
+              <div className='mt-4 flex flex-col'>
                 <label className='text-gray-600 font-medium'>
                   Foto Barda<span className='text-red-600'>*</span>
                 </label>

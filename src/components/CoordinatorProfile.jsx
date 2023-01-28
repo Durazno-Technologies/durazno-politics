@@ -4,14 +4,12 @@ import { getLeads, getAncestor, getAncestorMunicipality, updateAncestor } from '
 import { saveAs } from 'file-saver';
 import { ToastContainer, toast } from 'react-toastify';
 import ClipLoader from 'react-spinners/ClipLoader';
-import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 
 const CoordinatorProfile = ({ userProfile }) => {
-  const { user, signOut } = useAuthenticator((context) => [context.user]);
+  const { user } = useAuthenticator((context) => [context.user]);
   const [userInfo, setUserInfo] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
   const [representantesLeads, setRepresentantesLeads] = useState('');
   const [lonasLeads, setLonasLeads] = useState('');
@@ -190,128 +188,99 @@ const CoordinatorProfile = ({ userProfile }) => {
         </>
       )}
 
-      {!representantesLeads && (
-        <div className='mt-8'>
-          <p className='text-pink-800 text-sm font-bold mt-2'>
-            Aún no tienes registros de Representantes de Calle
-          </p>
-        </div>
-      )}
-      {representantesLeads && (
-        <div>
+      <div className='mt-16'>
+        {!representantesLeads && (
           <div className='mt-8'>
             <p className='text-pink-800 text-sm font-bold mt-2'>
-              Da click en el boton Descargar para obtener tus registros
+              *Aún no tienes registros de Representantes de Calle
             </p>
           </div>
-          <div className='mt-4 flex'>
-            <button
-              type='button'
-              onClick={() => {
-                downloadXLSFile(representantesLeads, 'Representantes de Calle');
-              }}
-              className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
-            >
-              Descargar Representantes de Calles
-            </button>
+        )}
+        {representantesLeads && (
+          <div>
+            <div className='mt-4 flex'>
+              <button
+                type='button'
+                onClick={() => {
+                  downloadXLSFile(representantesLeads, 'Representantes de Calle');
+                }}
+                className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+              >
+                Descargar Representantes de Calles
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {!lonasLeads && (
-        <div className='mt-8'>
-          <p className='text-pink-800 text-sm font-bold mt-2 '>Aún no tienes registros de Lonas</p>
-        </div>
-      )}
-      {lonasLeads && (
-        <div>
+        {!lonasLeads && (
+          <div className='mt-8'>
+            <p className='text-pink-800 text-sm font-bold mt-2 '>
+              *Aún no tienes registros de Lonas
+            </p>
+          </div>
+        )}
+        {lonasLeads && (
+          <div>
+            <div className='mt-4 flex'>
+              <button
+                type='button'
+                onClick={() => {
+                  downloadXLSFile(lonasLeads, 'Lonas');
+                }}
+                className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+              >
+                Descargar Lonas
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!bardasLeads && (
           <div className='mt-8'>
             <p className='text-pink-800 text-sm font-bold mt-2'>
-              Da click en el boton Descargar para obtener tus registros
+              *Aún no tienes registros de Bardas
             </p>
           </div>
-          <div className='mt-4 flex'>
-            <button
-              type='button'
-              onClick={() => {
-                downloadXLSFile(lonasLeads, 'Lonas');
-              }}
-              className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
-            >
-              Descargar Lonas
-            </button>
+        )}
+        {bardasLeads && (
+          <div>
+            <div className='mt-4 flex'>
+              <button
+                type='button'
+                onClick={() => {
+                  downloadXLSFile(bardasLeads, 'Bardas');
+                }}
+                className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+              >
+                Descargar Bardas
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {!bardasLeads && (
-        <div className='mt-8'>
-          <p className='text-pink-800 text-sm font-bold mt-2'>Aún no tienes registros de Bardas</p>
-        </div>
-      )}
-      {bardasLeads && (
-        <div>
+        {!promovidosLeads && (
           <div className='mt-8'>
             <p className='text-pink-800 text-sm font-bold mt-2'>
-              Da click en el boton Descargar para obtener tus registros
+              *Aún no tienes registros de Promovidos
             </p>
           </div>
-          <div className='mt-4 flex'>
-            <button
-              type='button'
-              onClick={() => {
-                downloadXLSFile(bardasLeads, 'Bardas');
-              }}
-              className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
-            >
-              Descargar Bardas
-            </button>
+        )}
+        {promovidosLeads && (
+          <div>
+            <div className='mt-4 flex'>
+              <button
+                type='button'
+                onClick={() => {
+                  downloadXLSFile(promovidosLeads, 'Promovidos');
+                }}
+                className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
+              >
+                Descargar Promovidos
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-
-      {!promovidosLeads && (
-        <div className='mt-8'>
-          <p className='text-pink-800 text-sm font-bold mt-2'>
-            Aún no tienes registros de Promovidos
-          </p>
-        </div>
-      )}
-      {promovidosLeads && (
-        <div>
-          <div className='mt-8'>
-            <p className='text-pink-800 text-sm font-bold mt-2'>
-              Da click en el boton Descargar para obtener tus registros
-            </p>
-          </div>
-          <div className='mt-4 flex'>
-            <button
-              type='button'
-              onClick={() => {
-                downloadXLSFile(promovidosLeads, 'Promovidos');
-              }}
-              className='inline-block w-full px-6 py-4 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
-            >
-              Descargar Promovidos
-            </button>
-          </div>
-        </div>
-      )}
-
-      <button
-        type='button'
-        onClick={() => {
-          signOut();
-          localStorage.setItem('alreadyLoaded', false);
-
-          setTimeout(() => {
-            navigate('/');
-          }, 1000);
-        }}
-        className='mt-8 w-full inline-block px-6 py-4 bg-pink-800 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-pink-700 hover:shadow-lg focus:bg-pink-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-pink-800 active:shadow-lg transition duration-150 ease-in-out max-w-xs'
-      >
-        Salir
-      </button>
+        )}
+      </div>
     </div>
   );
 };

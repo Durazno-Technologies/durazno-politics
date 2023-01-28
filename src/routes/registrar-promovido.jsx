@@ -59,16 +59,6 @@ const RegistrarPromovido = () => {
 
       let ledCreated = await createLead(led);
       if (ledCreated) {
-        toast.success('Promovido agregado correctamente!', {
-          position: 'top-right',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        });
         reset({
           municipality: municipalities[0],
           district: districts[0],
@@ -77,7 +67,6 @@ const RegistrarPromovido = () => {
           location: '',
           electorIdentifier: '',
         });
-        setIsLoading(false);
       } else {
         toast.error('Hubo un error agregando al promovido, favor de intentar más tarde', {
           position: 'top-right',
@@ -105,6 +94,18 @@ const RegistrarPromovido = () => {
         theme: 'light',
       });
     }
+
+    toast.success('Promovido agregado correctamente!', {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+    });
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -250,12 +251,12 @@ const RegistrarPromovido = () => {
             <Header />
 
             <ToastContainer />
-            <h1 className='mt-8 text-orange-900 font-extrabold text-3xl text-center'>
+            <h1 className='mt-8 text-orange-900 font-extrabold text-xl text-center'>
               #VamosConDelfina
             </h1>
-            <h3 className='text-red-800	font-extrabold text-xl text-center mt-2'>Registro</h3>
+            <h3 className='text-red-800	font-extrabold text-lg text-center mt-2'>Registro</h3>
             <form
-              className=' container max-w-xl mt-4 py-10 mt-10 px-4 border'
+              className='container max-w-xl mb-12 py-10 mt-10 px-4 border'
               onSubmit={handleSubmit(onSubmit)}
             >
               {Object.keys(selectedMunicipality).length > 0 && (
