@@ -58,10 +58,11 @@ const RegistrarRepresentanteCalle = () => {
       jwt: user.signInUserSession.idToken.jwtToken,
     };
 
+    console.log('before try');
     try {
-      console.log('esto deberia ir primero');
+      console.log('before create lead');
       await createLead(led);
-      console.log('esto deberia ir despues');
+      console.log('after create lead');
       /* reset({
         district: districts[0],
         section: sections[0],
@@ -72,8 +73,6 @@ const RegistrarRepresentanteCalle = () => {
         location: '',
         electorIdentifier: '',
       });*/
-      setIsLoading(false);
-      console.log('esto deberia ir mucho despues');
     } catch (e) {
       console.log(e);
       setIsLoading(false);
@@ -91,6 +90,9 @@ const RegistrarRepresentanteCalle = () => {
         },
       );
     }
+    console.log('after try');
+
+    setIsLoading(false);
     toast.success('Representante de calle agregado correctamente!', {
       position: 'top-right',
       autoClose: 5000,
@@ -101,7 +103,8 @@ const RegistrarRepresentanteCalle = () => {
       progress: undefined,
       theme: 'light',
     });
-    console.log('esto deberia ir al final');
+
+    console.log('end submit');
   };
 
   useEffect(() => {
