@@ -62,7 +62,7 @@ const Profile = ({ userProfile }) => {
         user.signInUserSession.idToken.jwtToken,
         'Promovido',
       );
-      if (promovidosLeads) {
+      if (promovidosLeadsData) {
         setPromovidosLeads(promovidosLeadsData);
       }
     };
