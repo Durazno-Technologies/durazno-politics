@@ -235,33 +235,6 @@ const RegistrarRepresentanteCalle = () => {
 
   console.log(isLoading);
 
-  {
-    if (isLoading) {
-      return (
-        <div className='h-screen flex justify-center items-center'>
-          <ToastContainer
-            position='top-right'
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme='light'
-          />
-          <ClipLoader
-            color={'#96272d'}
-            size={50}
-            aria-label='Loading Spinner'
-            data-testid='loader'
-          />
-        </div>
-      );
-    }
-  }
-
   if (hasErrors) {
     return (
       <div className='h-screen flex justify-center'>
@@ -284,291 +257,281 @@ const RegistrarRepresentanteCalle = () => {
     <>
       {authStatus !== 'authenticated' || user.attributes['custom:role'] === 'Dirigente' ? (
         <Navigate to='/' />
+      ) : isLoading ? (
+        <div className='h-screen flex justify-center items-center'>
+          <ClipLoader
+            color={'#96272d'}
+            size={50}
+            aria-label='Loading Spinner'
+            data-testid='loader'
+          />
+        </div>
       ) : (
-        <>
-          <div className='container mt-8 bg-white rounded-md pb-8 mb-8 pt-6 h-auto'>
-            <Header />
+        <div className='container mt-8 bg-white rounded-md pb-8 mb-8 pt-6 h-auto'>
+          <Header />
 
-            <ToastContainer
-              position='top-right'
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme='light'
-            />
-            <h1 className='mt-8 text-orange-900 font-extrabold text-xl text-center'>
-              #VamosConDelfina
-            </h1>
-            <h3 className='text-red-800	font-extrabold text-lg text-center mt-2'>Registro</h3>
-            <form
-              className='mb-12 container max-w-xl mt-4 py-10 mt-10 px-4 border'
-              onSubmit={handleSubmit(onSubmit)}
-            >
-              {Object.keys(selectedMunicipality).length > 0 && (
-                <>
-                  <div className='flex align-center justify-start'>
-                    <span className='flex items-center text-pink-800 text-sm font-bold'>
-                      Municipio:
-                    </span>
-                    <span className='bg-pink-800 ml-2 px-2 py-2 text- font-bold text-white text-sm '>
-                      {selectedMunicipality.name}
-                    </span>
-                  </div>
-                </>
-              )}
-
-              {municipalityDistricts.length > 0 && (
-                <div className='mt-4'>
-                  <label className='text-gray-600 font-medium'>
-                    Distrito <span className='text-red-600'>*</span>
-                  </label>
-                  <Controller
-                    name='district'
-                    control={control}
-                    defaultValue={municipalityDistricts[0]}
-                    render={({ field }) => {
-                      return (
-                        <Select
-                          options={municipalityDistricts}
-                          onChange={(val) => {
-                            let newDistrict = districts.filter(
-                              (district) => district.id === val.id,
-                            )[0];
-                            setSelectedDistrict(newDistrict);
-                            let newSections = newDistrict.sections.map((section) => ({
-                              label: section,
-                              value: section,
-                            }));
-                            setSections(newSections);
-                            setSelectedSection(newSections[0]);
-                            field.onChange(val);
-                          }}
-                          isSearchable={true}
-                          value={selectedDistrict}
-                        />
-                      );
-                    }}
-                  />
+          <ToastContainer
+            position='top-right'
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme='light'
+          />
+          <h1 className='mt-8 text-orange-900 font-extrabold text-xl text-center'>
+            #VamosConDelfina
+          </h1>
+          <h3 className='text-red-800	font-extrabold text-lg text-center mt-2'>Registro</h3>
+          <form
+            className='mb-12 container max-w-xl mt-4 py-10 mt-10 px-4 border'
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            {Object.keys(selectedMunicipality).length > 0 && (
+              <>
+                <div className='flex align-center justify-start'>
+                  <span className='flex items-center text-pink-800 text-sm font-bold'>
+                    Municipio:
+                  </span>
+                  <span className='bg-pink-800 ml-2 px-2 py-2 text- font-bold text-white text-sm '>
+                    {selectedMunicipality.name}
+                  </span>
                 </div>
-              )}
+              </>
+            )}
 
-              {sections.length > 0 && (
-                <div className='mt-4'>
-                  <label className='text-gray-600 font-medium'>
-                    Sección <span className='text-red-600'>*</span>
-                  </label>
-                  <Controller
-                    name='section'
-                    control={control}
-                    defaultValue={sections[0]}
-                    render={({ field }) => (
+            {municipalityDistricts.length > 0 && (
+              <div className='mt-4'>
+                <label className='text-gray-600 font-medium'>
+                  Distrito <span className='text-red-600'>*</span>
+                </label>
+                <Controller
+                  name='district'
+                  control={control}
+                  defaultValue={municipalityDistricts[0]}
+                  render={({ field }) => {
+                    return (
                       <Select
-                        options={sections}
+                        options={municipalityDistricts}
                         onChange={(val) => {
-                          setSelectedSection(
-                            sections.filter((section) => section.value === val.value)[0],
-                          );
+                          let newDistrict = districts.filter(
+                            (district) => district.id === val.id,
+                          )[0];
+                          setSelectedDistrict(newDistrict);
+                          let newSections = newDistrict.sections.map((section) => ({
+                            label: section,
+                            value: section,
+                          }));
+                          setSections(newSections);
+                          setSelectedSection(newSections[0]);
                           field.onChange(val);
                         }}
                         isSearchable={true}
-                        value={selectedSection}
+                        value={selectedDistrict}
                       />
-                    )}
-                  />
+                    );
+                  }}
+                />
+              </div>
+            )}
+
+            {sections.length > 0 && (
+              <div className='mt-4'>
+                <label className='text-gray-600 font-medium'>
+                  Sección <span className='text-red-600'>*</span>
+                </label>
+                <Controller
+                  name='section'
+                  control={control}
+                  defaultValue={sections[0]}
+                  render={({ field }) => (
+                    <Select
+                      options={sections}
+                      onChange={(val) => {
+                        setSelectedSection(
+                          sections.filter((section) => section.value === val.value)[0],
+                        );
+                        field.onChange(val);
+                      }}
+                      isSearchable={true}
+                      value={selectedSection}
+                    />
+                  )}
+                />
+              </div>
+            )}
+
+            <div className='mt-4'>
+              <label className='text-gray-600 font-medium'>
+                Nombre(s) <span className='text-red-600'>*</span>
+              </label>
+              <input
+                className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700 uppercase'
+                name='name'
+                {...register('name', { required: true, maxLength: 50, validate: isValidName })}
+              />
+              {errors?.name?.type === 'required' && (
+                <div className='mb-3 text-normal text-red-500'>Favor de ingresar un nombre</div>
+              )}
+              {errors?.name?.type === 'maxLength' && (
+                <div className='mb-3 text-normal text-red-500'>
+                  Nombre muy largo, favor de ingresar uno más corto
                 </div>
               )}
-
-              <div className='mt-4'>
-                <label className='text-gray-600 font-medium'>
-                  Nombre(s) <span className='text-red-600'>*</span>
-                </label>
-                <input
-                  className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700 uppercase'
-                  name='name'
-                  {...register('name', { required: true, maxLength: 50, validate: isValidName })}
-                />
-                {errors?.name?.type === 'required' && (
-                  <div className='mb-3 text-normal text-red-500'>Favor de ingresar un nombre</div>
-                )}
-                {errors?.name?.type === 'maxLength' && (
-                  <div className='mb-3 text-normal text-red-500'>
-                    Nombre muy largo, favor de ingresar uno más corto
-                  </div>
-                )}
-                {errors?.name?.type === 'validate' && (
-                  <div className='mb-3 text-normal text-red-500'>
-                    Formato incorrecto, favor de verificar carácteres y espacios
-                  </div>
-                )}
-              </div>
-
-              <div className='mt-4'>
-                <label className='text-gray-600 font-medium'>
-                  Apellido paterno <span className='text-red-600'>*</span>
-                </label>
-                <input
-                  className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700 uppercase'
-                  name='lastName'
-                  {...register('lastName', {
-                    required: true,
-                    maxLength: 50,
-                    validate: isValidLastName,
-                  })}
-                />
-                {errors?.lastName?.type === 'required' && (
-                  <div className='mb-3 text-normal text-red-500'>Favor de ingresar un apellido</div>
-                )}
-                {errors?.lastName?.type === 'maxLength' && (
-                  <div className='mb-3 text-normal text-red-500'>
-                    Apellido muy largo, favor de ingresar uno más corto
-                  </div>
-                )}
-                {errors?.lastName?.type === 'validate' && (
-                  <div className='mb-3 text-normal text-red-500'>
-                    Formato incorrecto, favor de verificar carácteres y espacios
-                  </div>
-                )}
-              </div>
-
-              <div className='mt-4'>
-                <label className='text-gray-600 font-medium'>
-                  Apellido materno <span className='text-red-600'>*</span>
-                </label>
-                <input
-                  className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700 uppercase'
-                  name='middleName'
-                  {...register('middleName', {
-                    required: true,
-                    maxLength: 50,
-                    validate: isValidLastName,
-                  })}
-                />
-                {errors?.middleName?.type === 'required' && (
-                  <div className='mb-3 text-normal text-red-500'>Favor de ingresar un apellido</div>
-                )}
-                {errors?.middleName?.type === 'maxLength' && (
-                  <div className='mb-3 text-normal text-red-500'>
-                    Apellido muy largo, favor de ingresar uno más corto
-                  </div>
-                )}
-                {errors?.middleName?.type === 'validate' && (
-                  <div className='mb-3 text-normal text-red-500'>
-                    Formato incorrecto, favor de verificar carácteres y espacios
-                  </div>
-                )}
-              </div>
-              <div className='mt-4'>
-                <label htmlFor='phoneNumber' className='text-gray-600 font-medium'>
-                  Teléfono <span className='text-red-600'>*</span>
-                </label>
-                <Controller
-                  name='phoneNumber'
-                  control={control}
-                  rules={{
-                    validate: (value) => isAvailable(value),
-                  }}
-                  render={({ field: { onChange, value } }) => (
-                    <Input
-                      value={value}
-                      onChange={onChange}
-                      country='MX'
-                      id='phoneNumber'
-                      className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700'
-                    />
-                  )}
-                />
-                {errors['phoneNumber'] && (
-                  <div className='mb-3 text-normal text-red-500'>{phoneNumberError}</div>
-                )}
-              </div>
-
-              {/*<div className='mt-4'>
-                <label htmlFor='phoneNumber' className='text-gray-600 font-medium'>
-                  ID del Referente <span className='text-red-600'>*</span>
-                </label>
-                <input
-                  className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700'
-                  name='idAncestor'
-                  {...register('idAncestor', {
-                    validate: (value) => isValidIdAncestor(value),
-                  })}
-                />
-                {errors.idAncestor && (
-                  <div className='mb-3 text-normal text-red-500'>{ancestorIdError}</div>
-                )}
-              </div>
-                {ancestorName && <p className='bg-sky-400 text-neutral-50	mt-2 p-2'>{ancestorName}</p>} */}
-
-              <div className='mt-4'>
-                <label className='text-gray-600 font-medium'>
-                  Dirección <span className='text-red-600'>*</span>
-                </label>
-                <Controller
-                  name='location'
-                  rules={{ required: true }}
-                  control={control}
-                  placeh
-                  render={({ field, fieldState }) => (
-                    <GooglePlacesAutocomplete
-                      apiKey={process.env.REACT_APP_GOOGLE_API_KEY}
-                      error={fieldState.error}
-                      selectProps={{
-                        ...field,
-                        isClearable: true,
-                        placeholder: 'Ingresa una dirección',
-                      }}
-                      apiOptions={{ language: 'es', region: 'mx' }}
-                    />
-                  )}
-                />
-              </div>
-              {errors.location && (
-                <div className='mb-3 text-normal text-red-500'>Favor de ingresar una dirección</div>
+              {errors?.name?.type === 'validate' && (
+                <div className='mb-3 text-normal text-red-500'>
+                  Formato incorrecto, favor de verificar carácteres y espacios
+                </div>
               )}
+            </div>
 
-              <div className='mt-4'>
-                <label className='text-gray-600 font-medium'>
-                  Clave de Elector <span className='text-red-600'>*</span>
-                </label>
-                <input
-                  className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700'
-                  name='electorIdentifier'
-                  {...register('electorIdentifier', {
-                    required: true,
-                    validate: isValidElectorIdentifier,
-                  })}
-                />
-                {errors?.electorIdentifier?.type === 'required' && (
-                  <div className='mb-3 text-normal text-red-500'>
-                    Favor de ingresar una clave de elector
-                  </div>
-                )}
-                {errors?.electorIdentifier?.type === 'validate' && (
-                  <div className='mb-3 text-normal text-red-500'>
-                    Favor de ingresar una clave de elector valida
-                  </div>
-                )}
-              </div>
+            <div className='mt-4'>
+              <label className='text-gray-600 font-medium'>
+                Apellido paterno <span className='text-red-600'>*</span>
+              </label>
+              <input
+                className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700 uppercase'
+                name='lastName'
+                {...register('lastName', {
+                  required: true,
+                  maxLength: 50,
+                  validate: isValidLastName,
+                })}
+              />
+              {errors?.lastName?.type === 'required' && (
+                <div className='mb-3 text-normal text-red-500'>Favor de ingresar un apellido</div>
+              )}
+              {errors?.lastName?.type === 'maxLength' && (
+                <div className='mb-3 text-normal text-red-500'>
+                  Apellido muy largo, favor de ingresar uno más corto
+                </div>
+              )}
+              {errors?.lastName?.type === 'validate' && (
+                <div className='mb-3 text-normal text-red-500'>
+                  Formato incorrecto, favor de verificar carácteres y espacios
+                </div>
+              )}
+            </div>
 
-              <button
-                className={
-                  isLoading
-                    ? 'mt-8 w-full bg-slate-400 hover:bg-slate-600 text-white-100 border py-3 px-6 font-semibold text-md rounded'
-                    : 'mt-8 w-full bg-green-400 hover:bg-green-600 text-green-100 border py-3 px-6 font-semibold text-md rounded'
-                }
-                type='submit'
-                disabled={isLoading}
-              >
-                Enviar
-              </button>
-            </form>
-          </div>
-        </>
+            <div className='mt-4'>
+              <label className='text-gray-600 font-medium'>
+                Apellido materno <span className='text-red-600'>*</span>
+              </label>
+              <input
+                className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700 uppercase'
+                name='middleName'
+                {...register('middleName', {
+                  required: true,
+                  maxLength: 50,
+                  validate: isValidLastName,
+                })}
+              />
+              {errors?.middleName?.type === 'required' && (
+                <div className='mb-3 text-normal text-red-500'>Favor de ingresar un apellido</div>
+              )}
+              {errors?.middleName?.type === 'maxLength' && (
+                <div className='mb-3 text-normal text-red-500'>
+                  Apellido muy largo, favor de ingresar uno más corto
+                </div>
+              )}
+              {errors?.middleName?.type === 'validate' && (
+                <div className='mb-3 text-normal text-red-500'>
+                  Formato incorrecto, favor de verificar carácteres y espacios
+                </div>
+              )}
+            </div>
+            <div className='mt-4'>
+              <label htmlFor='phoneNumber' className='text-gray-600 font-medium'>
+                Teléfono <span className='text-red-600'>*</span>
+              </label>
+              <Controller
+                name='phoneNumber'
+                control={control}
+                rules={{
+                  validate: (value) => isAvailable(value),
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    value={value}
+                    onChange={onChange}
+                    country='MX'
+                    id='phoneNumber'
+                    className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700'
+                  />
+                )}
+              />
+              {errors['phoneNumber'] && (
+                <div className='mb-3 text-normal text-red-500'>{phoneNumberError}</div>
+              )}
+            </div>
+
+            <div className='mt-4'>
+              <label className='text-gray-600 font-medium'>
+                Dirección <span className='text-red-600'>*</span>
+              </label>
+              <Controller
+                name='location'
+                rules={{ required: true }}
+                control={control}
+                placeh
+                render={({ field, fieldState }) => (
+                  <GooglePlacesAutocomplete
+                    apiKey={process.env.REACT_APP_GOOGLE_API_KEY}
+                    error={fieldState.error}
+                    selectProps={{
+                      ...field,
+                      isClearable: true,
+                      placeholder: 'Ingresa una dirección',
+                    }}
+                    apiOptions={{ language: 'es', region: 'mx' }}
+                  />
+                )}
+              />
+            </div>
+            {errors.location && (
+              <div className='mb-3 text-normal text-red-500'>Favor de ingresar una dirección</div>
+            )}
+
+            <div className='mt-4'>
+              <label className='text-gray-600 font-medium'>
+                Clave de Elector <span className='text-red-600'>*</span>
+              </label>
+              <input
+                className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700'
+                name='electorIdentifier'
+                {...register('electorIdentifier', {
+                  required: true,
+                  validate: isValidElectorIdentifier,
+                })}
+              />
+              {errors?.electorIdentifier?.type === 'required' && (
+                <div className='mb-3 text-normal text-red-500'>
+                  Favor de ingresar una clave de elector
+                </div>
+              )}
+              {errors?.electorIdentifier?.type === 'validate' && (
+                <div className='mb-3 text-normal text-red-500'>
+                  Favor de ingresar una clave de elector valida
+                </div>
+              )}
+            </div>
+
+            <button
+              className={
+                isLoading
+                  ? 'mt-8 w-full bg-slate-400 hover:bg-slate-600 text-white-100 border py-3 px-6 font-semibold text-md rounded'
+                  : 'mt-8 w-full bg-green-400 hover:bg-green-600 text-green-100 border py-3 px-6 font-semibold text-md rounded'
+              }
+              type='submit'
+              disabled={isLoading}
+            >
+              Enviar
+            </button>
+          </form>
+        </div>
       )}
     </>
   );
