@@ -200,14 +200,6 @@ const RegistrarPromovido = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className='h-screen flex justify-center items-center'>
-        <ClipLoader color={'#96272d'} size={50} aria-label='Loading Spinner' data-testid='loader' />
-      </div>
-    );
-  }
-
   if (hasErrors) {
     return (
       <div className='h-screen flex justify-center'>
@@ -230,6 +222,15 @@ const RegistrarPromovido = () => {
     <>
       {authStatus !== 'authenticated' || user.attributes['custom:role'] === 'Dirigente' ? (
         <Navigate to='/' />
+      ) : isLoading ? (
+        <div className='h-screen flex justify-center items-center'>
+          <ClipLoader
+            color={'#96272d'}
+            size={50}
+            aria-label='Loading Spinner'
+            data-testid='loader'
+          />
+        </div>
       ) : (
         <>
           <div className='container mt-8 mb-8 pb-8 bg-white rounded-md  pt-6 h-auto'>

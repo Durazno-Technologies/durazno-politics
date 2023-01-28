@@ -260,14 +260,6 @@ const RegistrarBarda = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className='h-screen flex justify-center items-center'>
-        <ClipLoader color={'#96272d'} size={50} aria-label='Loading Spinner' data-testid='loader' />
-      </div>
-    );
-  }
-
   if (hasErrors) {
     return (
       <div className='h-screen flex justify-center'>
