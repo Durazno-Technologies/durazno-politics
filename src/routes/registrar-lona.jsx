@@ -95,9 +95,31 @@ const RegistrarLona = () => {
             inePicture: ineURL,
           };
 
-          let ledCreated = await createLead(led);
-          console.log(ledCreated);
-          if (ledCreated) {
+          await createLead(led);
+          console.log('este se debe imprimir primero LOLLL');
+
+          reset({
+            district: districts[0],
+            section: sections[0],
+            phoneNumber: '',
+            location: '',
+            electorIdentifier: '',
+          });
+
+          setIsLoading(false);
+          console.log('este se debe imprimir tambien');
+          toast.success('Lona agregada correctamente!', {
+            position: 'top-right',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'light',
+          });
+          console.log('y por ultimo este');
+          /*if (ledCreated) {
             reset({
               district: districts[0],
               section: sections[0],
@@ -116,7 +138,7 @@ const RegistrarLona = () => {
               progress: undefined,
               theme: 'light',
             });
-          }
+          }*/
         });
       });
     } catch (e) {
@@ -134,18 +156,6 @@ const RegistrarLona = () => {
 
       console.log(e);
     }
-    setIsLoading(false);
-
-    toast.success('Lona agregada correctamente!', {
-      position: 'top-right',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'light',
-    });
   };
 
   useEffect(() => {

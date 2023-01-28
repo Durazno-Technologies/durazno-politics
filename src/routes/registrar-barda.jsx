@@ -95,9 +95,26 @@ const RegistrarBarda = () => {
             inePicture: ineURL,
           };
 
-          let ledCreated = await createLead(led);
-          console.log(ledCreated);
-          if (ledCreated) {
+          await createLead(led);
+          reset({
+            district: districts[0],
+            section: sections[0],
+            phoneNumber: '',
+            location: '',
+            electorIdentifier: '',
+          });
+          setIsLoading(false);
+          toast.success('Barda agregada correctamente!', {
+            position: 'top-right',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'light',
+          });
+          /*if (ledCreated) {
             reset({
               district: districts[0],
               section: sections[0],
@@ -116,7 +133,7 @@ const RegistrarBarda = () => {
               progress: undefined,
               theme: 'light',
             });
-          }
+          }*/
         });
       });
     } catch (e) {
@@ -133,17 +150,6 @@ const RegistrarBarda = () => {
       });
       console.log(e);
     }
-    setIsLoading(false);
-    toast.success('Barda agregada correctamente!', {
-      position: 'top-right',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'light',
-    });
   };
 
   useEffect(() => {

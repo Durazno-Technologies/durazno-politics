@@ -60,9 +60,34 @@ const RegistrarRepresentanteCalle = () => {
     };
 
     try {
-      let ledCreated = await createLead(led);
-      console.log(ledCreated);
-      if (ledCreated) {
+      await createLead(led);
+      console.log('primero aqui');
+
+      reset({
+        district: districts[0],
+        section: sections[0],
+        name: '',
+        lastName: '',
+        middleName: '',
+        phoneNumber: '',
+        location: '',
+        electorIdentifier: '',
+      });
+      setIsLoading(false);
+      console.log('despues aqui');
+
+      toast.success('Representante de calle agregado correctamente!', {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
+      console.log('al final aqui');
+      /*if (ledCreated) {
         reset({
           district: districts[0],
           section: sections[0],
@@ -89,7 +114,7 @@ const RegistrarRepresentanteCalle = () => {
           },
         );
         setIsLoading(false);
-      }
+      }*/
     } catch (e) {
       console.log(e);
       setIsLoading(false);
@@ -107,17 +132,6 @@ const RegistrarRepresentanteCalle = () => {
         },
       );
     }
-    setIsLoading(false);
-    toast.success('Representante de calle agregado correctamente!', {
-      position: 'top-right',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'light',
-    });
   };
 
   useEffect(() => {

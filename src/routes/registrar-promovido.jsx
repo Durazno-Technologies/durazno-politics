@@ -57,32 +57,28 @@ const RegistrarPromovido = () => {
     try {
       setIsLoading(true);
 
-      let ledCreated = await createLead(led);
-      if (ledCreated) {
-        reset({
-          municipality: municipalities[0],
-          district: districts[0],
-          section: sections[0],
-          phoneNumber: '',
-          location: '',
-          electorIdentifier: '',
-        });
-      } else {
-        toast.error('Hubo un error agregando al promovido, favor de intentar más tarde', {
-          position: 'top-right',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        });
-        setIsLoading(false);
-      }
+      await createLead(led);
+      reset({
+        municipality: municipalities[0],
+        district: districts[0],
+        section: sections[0],
+        phoneNumber: '',
+        location: '',
+        electorIdentifier: '',
+      });
+      setIsLoading(false);
+      toast.success('Promovido agregado correctamente!', {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
     } catch (e) {
       setIsLoading(false);
-
       toast.error('Hubo un error agregando al promovido, favor de intentar más tarde', {
         position: 'top-right',
         autoClose: 5000,
@@ -94,18 +90,6 @@ const RegistrarPromovido = () => {
         theme: 'light',
       });
     }
-
-    setIsLoading(false);
-    toast.success('Promovido agregado correctamente!', {
-      position: 'top-right',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'light',
-    });
   };
 
   useEffect(() => {
