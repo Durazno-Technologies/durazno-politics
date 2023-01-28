@@ -236,13 +236,30 @@ const RegistrarRepresentanteCalle = () => {
   console.log(isLoading);
 
   {
-    /*if (isLoading) {
-    return (
-      <div className='h-screen flex justify-center items-center'>
-        <ClipLoader color={'#96272d'} size={50} aria-label='Loading Spinner' data-testid='loader' />
-      </div>
-    );
-  }*/
+    if (isLoading) {
+      return (
+        <div className='h-screen flex justify-center items-center'>
+          <ToastContainer
+            position='top-right'
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme='light'
+          />
+          <ClipLoader
+            color={'#96272d'}
+            size={50}
+            aria-label='Loading Spinner'
+            data-testid='loader'
+          />
+        </div>
+      );
+    }
   }
 
   if (hasErrors) {
