@@ -12,6 +12,13 @@ import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import Header from '../components/Header';
 import 'react-toastify/dist/ReactToastify.css';
 
+const overrideSpinnersStyles = {
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+};
+
 const RegistrarPromovido = () => {
   const { authStatus, user } = useAuthenticator((context) => [context.authStatus]);
   const { route } = useAuthenticator((context) => [context.route]);
@@ -77,7 +84,6 @@ const RegistrarPromovido = () => {
         progress: undefined,
         theme: 'light',
       });
-      alert('Promovido agregado correctamente!');
     } catch (e) {
       setIsLoading(false);
       toast.error('Hubo un error agregando al promovido, favor de intentar más tarde', {
@@ -210,7 +216,6 @@ const RegistrarPromovido = () => {
     );
   }
 
-  console.log(authStatus);
   if (authStatus === 'configuring') {
     return (
       <div className='h-screen flex justify-center items-center'>
@@ -223,19 +228,19 @@ const RegistrarPromovido = () => {
     <>
       {authStatus !== 'authenticated' || user.attributes['custom:role'] === 'Dirigente' ? (
         <Navigate to='/' />
-      ) : isLoading ? (
-        <div className='h-screen flex justify-center items-center'>
-          <ClipLoader
-            color={'#96272d'}
-            size={50}
-            aria-label='Loading Spinner'
-            data-testid='loader'
-          />
-        </div>
       ) : (
         <>
           <div className='container mt-8 mb-8 pb-8 bg-white rounded-md  pt-6 h-auto'>
             <Header />
+
+            <ClipLoader
+              color={'#96272d'}
+              size={50}
+              aria-label='Loading Spinner'
+              data-testid='loader'
+              loading={isLoading}
+              cssOverride={overrideSpinnersStyles}
+            />
 
             <ToastContainer
               position='top-right'

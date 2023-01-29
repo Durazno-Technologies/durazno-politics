@@ -13,9 +13,10 @@ import Header from '../components/Header';
 import 'react-toastify/dist/ReactToastify.css';
 
 const overrideSpinnersStyles = {
-  display: 'block',
-  margin: '0 auto',
-  borderColor: 'red',
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
 };
 
 const RegistrarRepresentanteCalle = () => {
@@ -223,8 +224,6 @@ const RegistrarRepresentanteCalle = () => {
     }
   };
 
-  console.log(isLoading);
-
   if (hasErrors) {
     return (
       <div className='h-screen flex justify-center'>
@@ -234,8 +233,6 @@ const RegistrarRepresentanteCalle = () => {
       </div>
     );
   }
-
-  console.log(authStatus);
 
   if (authStatus === 'configuring') {
     return (

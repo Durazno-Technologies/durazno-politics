@@ -19,6 +19,13 @@ import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import Header from '../components/Header';
 import 'react-toastify/dist/ReactToastify.css';
 
+const overrideSpinnersStyles = {
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+};
+
 const RegistrarLona = () => {
   const { authStatus, user } = useAuthenticator((context) => [context.authStatus]);
   const { route } = useAuthenticator((context) => [context.route]);
@@ -118,29 +125,6 @@ const RegistrarLona = () => {
             progress: undefined,
             theme: 'light',
           });
-          alert('Lona agregada correctamente!');
-
-          console.log('y por ultimo este');
-          /*if (ledCreated) {
-            reset({
-              district: districts[0],
-              section: sections[0],
-              phoneNumber: '',
-              location: '',
-              electorIdentifier: '',
-            });
-          } else {
-            toast.error('Hubo un error agregando la lona, favor de intentar más tarde', {
-              position: 'top-right',
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: 'light',
-            });
-          }*/
         });
       });
     } catch (e) {
@@ -289,19 +273,18 @@ const RegistrarLona = () => {
     <>
       {authStatus !== 'authenticated' || user.attributes['custom:role'] === 'Dirigente' ? (
         <Navigate to='/' />
-      ) : isLoading ? (
-        <div className='h-screen flex justify-center items-center'>
-          <ClipLoader
-            color={'#96272d'}
-            size={50}
-            aria-label='Loading Spinner'
-            data-testid='loader'
-          />
-        </div>
       ) : (
         <>
           <div className='container mt-8 mb-8 pb-8 bg-white rounded-md  pt-6 h-auto'>
             <Header />
+            <ClipLoader
+              color={'#96272d'}
+              size={50}
+              aria-label='Loading Spinner'
+              data-testid='loader'
+              loading={isLoading}
+              cssOverride={overrideSpinnersStyles}
+            />
 
             <ToastContainer
               position='top-right'
