@@ -12,6 +12,12 @@ import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import Header from '../components/Header';
 import 'react-toastify/dist/ReactToastify.css';
 
+const overrideSpinnersStyles = {
+  display: 'block',
+  margin: '0 auto',
+  borderColor: 'red',
+};
+
 const RegistrarRepresentanteCalle = () => {
   const { authStatus, user } = useAuthenticator((context) => [context.authStatus]);
   const { route } = useAuthenticator((context) => [context.route]);
@@ -89,7 +95,7 @@ const RegistrarRepresentanteCalle = () => {
       location: '',
       electorIdentifier: '',
     });
-    /*toast.success('Representante de calle agregado correctamente!', {
+    toast.success('Representante de calle agregado correctamente!', {
       position: 'top-right',
       autoClose: 5000,
       hideProgressBar: false,
@@ -98,8 +104,7 @@ const RegistrarRepresentanteCalle = () => {
       draggable: true,
       progress: undefined,
       theme: 'light',
-    });*/
-    alert('Representante de calle agregado correctamente!');
+    });
   };
 
   useEffect(() => {
@@ -244,9 +249,17 @@ const RegistrarRepresentanteCalle = () => {
     <>
       {authStatus !== 'authenticated' || user.attributes['custom:role'] === 'Dirigente' ? (
         <Navigate to='/' />
-      ) : !isLoading ? (
+      ) : (
         <div className='container mt-8 bg-white rounded-md pb-8 mb-8 pt-6 h-auto'>
           <Header />
+          <ClipLoader
+            color={'#96272d'}
+            size={50}
+            aria-label='Loading Spinner'
+            data-testid='loader'
+            loading={isLoading}
+            cssOverride={overrideSpinnersStyles}
+          />
 
           <ToastContainer
             position='top-right'
@@ -509,15 +522,6 @@ const RegistrarRepresentanteCalle = () => {
               Enviar
             </button>
           </form>
-        </div>
-      ) : (
-        <div className='h-screen flex justify-center items-center'>
-          <ClipLoader
-            color={'#96272d'}
-            size={50}
-            aria-label='Loading Spinner'
-            data-testid='loader'
-          />
         </div>
       )}
     </>
