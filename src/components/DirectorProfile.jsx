@@ -98,7 +98,7 @@ const Profile = ({ userProfile }) => {
 
   useEffect(() => {
     if (Object.keys(userInfo).length > 0) {
-      if (Object.hasOwn(userInfo, 'municipality') && userInfo.municipality) {
+      if (Object.prototype.hasOwnProperty.call(userInfo, 'municipality') && userInfo.municipality) {
         console.log('Tiene municipio');
       } else {
         console.log('No tiene municipio');

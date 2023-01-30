@@ -90,7 +90,7 @@ const CoordinatorProfile = ({ userProfile }) => {
       }
     };
     if (Object.keys(userInfo).length > 0) {
-      if (!Object.hasOwn(userInfo, 'municipality')) {
+      if (!Object.prototype.hasOwnProperty.call(userInfo, 'municipality')) {
         getAncestorMunicipalityData();
       }
     }
