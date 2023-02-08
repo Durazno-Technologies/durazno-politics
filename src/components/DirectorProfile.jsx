@@ -192,8 +192,6 @@ const Profile = ({ userProfile }) => {
 
   const closeModal = () => setIsOpen(!modalIsOpen);
 
-  console.log(modalIsOpen);
-
   if (isLoading) {
     return (
       <div className='h-screen flex justify-center items-center'>

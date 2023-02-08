@@ -59,6 +59,7 @@ const RegistrarPromovido = () => {
       type: 'Promovido',
       ancestor: userInfo.identifier,
       jwt: user.signInUserSession.idToken.jwtToken,
+      ine: fields.electorIdentifier,
     };
 
     try {
@@ -72,6 +73,7 @@ const RegistrarPromovido = () => {
         phoneNumber: '',
         location: '',
         electorIdentifier: '',
+        peopleVoting: '',
       });
       setIsLoading(false);
       toast.success('Promovido agregado correctamente!', {
@@ -197,12 +199,21 @@ const RegistrarPromovido = () => {
   };
 
   const isValidElectorIdentifier = (electorIdentifier) => {
+    if (electorIdentifier.length === 0) {
+      return true;
+    }
     if (electorIdentifier.length !== 18) {
+      //setIneError('Favor de ingresar una clave de elector valida');
       return false;
     } else {
       electorIdentifier = electorIdentifier.toUpperCase();
       const regex = /\b[A-Z]{6}[0-9]{8}[A-Z]{1}[0-9]{3}/;
-      return regex.test(electorIdentifier);
+      if (!regex.test(electorIdentifier)) {
+        //setIneError('Favor de ingresar una clave de elector valida');
+        return false;
+      } else {
+        return true;
+      }
     }
   };
 
@@ -390,21 +401,16 @@ const RegistrarPromovido = () => {
 
               <div className='mt-4'>
                 <label className='text-gray-600 font-medium'>
-                  Clave de Elector <span className='text-red-600'>*</span>
+                  Clave de Elector <span className='text-red-600 text-xs'>(Opcional)</span>
                 </label>
                 <input
                   className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700'
                   name='electorIdentifier'
                   {...register('electorIdentifier', {
-                    required: true,
                     validate: isValidElectorIdentifier,
                   })}
                 />
-                {errors?.electorIdentifier?.type === 'required' && (
-                  <div className='mb-3 text-normal text-red-500'>
-                    Favor de ingresar una clave de elector
-                  </div>
-                )}
+
                 {errors?.electorIdentifier?.type === 'validate' && (
                   <div className='mb-3 text-normal text-red-500'>
                     Favor de ingresar una clave de elector valida
@@ -422,6 +428,7 @@ const RegistrarPromovido = () => {
                   {...register('peopleVoting', {
                     required: true,
                     min: 1,
+                    max: 50,
                   })}
                   type='number'
                 />
@@ -431,6 +438,11 @@ const RegistrarPromovido = () => {
                   </div>
                 )}
                 {errors?.peopleVoting?.type === 'min' && (
+                  <div className='mb-3 text-normal text-red-500'>
+                    Favor de ingresar un número valido
+                  </div>
+                )}
+                {errors?.peopleVoting?.type === 'max' && (
                   <div className='mb-3 text-normal text-red-500'>
                     Favor de ingresar un número valido
                   </div>
