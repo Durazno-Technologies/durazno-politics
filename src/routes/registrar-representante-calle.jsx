@@ -275,7 +275,7 @@ const RegistrarRepresentanteCalle = () => {
           </h1>
           <h3 className='text-red-800	font-extrabold text-lg text-center mt-2'>Registro</h3>
           <form
-            className='mb-12 container max-w-xl mt-4 py-10 mt-10 px-4 border'
+            className='mb-12 container max-w-xl py-10 mt-10 px-4 border'
             onSubmit={handleSubmit(onSubmit)}
           >
             {Object.keys(selectedMunicipality).length > 0 && (

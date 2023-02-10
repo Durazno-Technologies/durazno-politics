@@ -109,6 +109,8 @@ const RegistrarBarda = () => {
             phoneNumber: '',
             location: '',
             electorIdentifier: '',
+            inePicture: '',
+            bardaPicture: '',
           });
           setIsLoading(false);
           toast.success('Barda agregada correctamente!', {
@@ -296,7 +298,7 @@ const RegistrarBarda = () => {
             </h1>
             <h3 className='text-red-800	font-extrabold text-lg text-center mt-2'>Registro</h3>
             <form
-              className=' container max-w-xl mt-4 mb-12 py-10 mt-10 px-4 border'
+              className=' container max-w-xl  mb-12 py-10 mt-10 px-4 border'
               onSubmit={handleSubmit(onSubmit)}
             >
               {Object.keys(selectedMunicipality).length > 0 && (
@@ -461,8 +463,8 @@ const RegistrarBarda = () => {
                         files[0]?.size < 10000000 ||
                         'Tamaño máximo permitido por imagen es de 10 MB',
                       acceptedFormats: (files) =>
-                        ['image/jpeg', 'image/png'].includes(files[0]?.type) ||
-                        'Solamente puedes subir imágenes en formato PNG o JPEG',
+                        ['image/jpeg', 'image/png', 'image/heic'].includes(files[0]?.type) ||
+                        'Solamente puedes subir imágenes en formato PNG, JPEG o HEIC',
                     },
                   })}
                   type='file'
@@ -488,8 +490,8 @@ const RegistrarBarda = () => {
                         files[0]?.size < 10000000 ||
                         'Tamaño máximo permitido por imagen es de 10 MB',
                       acceptedFormats: (files) =>
-                        ['image/jpeg', 'image/png'].includes(files[0]?.type) ||
-                        'Solamente puedes subir imágenes en formato PNG o JPEG',
+                        ['image/jpeg', 'image/png', 'image/heic'].includes(files[0]?.type) ||
+                        'Solamente puedes subir imágenes en formato PNG, JPEG o HEIC',
                     },
                   })}
                   type='file'

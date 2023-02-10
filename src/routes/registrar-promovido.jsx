@@ -3,8 +3,15 @@ import { useForm, Controller } from 'react-hook-form';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import Select from 'react-select';
+import { v4 as uuidv4 } from 'uuid';
 import ClipLoader from 'react-spinners/ClipLoader';
-import { getMunicipalities, getDistricts, getAncestor, createLead } from '../services/api';
+import {
+  getMunicipalities,
+  getDistricts,
+  getAncestor,
+  createLead,
+  uploadFile,
+} from '../services/api';
 import { ToastContainer, toast } from 'react-toastify';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import Input from 'react-phone-number-input/input';
@@ -48,11 +55,53 @@ const RegistrarPromovido = () => {
   });
   const onSubmit = async (data) => {
     const { fields } = { fields: data };
+    console.log(fields);
+    let ineURL = '';
+
+    if (fields.inePicture[0]) {
+      let pathIne = fields.inePicture[0].name.split('/');
+      const _fileNameIne = pathIne.pop();
+      pathIne = pathIne.join('/');
+      const [fileNameIne, fileExtensionIne] = _fileNameIne.split('.');
+      try {
+        setIsLoading(true);
+
+        const presignedIne = await uploadFile(
+          `${pathIne}${fileNameIne}-${uuidv4()}.${fileExtensionIne}`,
+          fields.inePicture[0].type,
+          user.signInUserSession.idToken.jwtToken,
+        );
+
+        await fetch(presignedIne, {
+          method: 'PUT',
+          body: fields.inePicture[0],
+        }).then(async (ine) => {
+          ineURL = ine.url.slice(0, ine.url.search(/[?]/));
+          console.log('dentro del fetch');
+          console.log(ineURL);
+        });
+      } catch (e) {
+        setIsLoading(false);
+        toast.error('Hubo un error agregando al promovido, favor de intentar más tarde', {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        });
+      }
+    }
 
     let led = {
       municipality: selectedMunicipality.value,
       district: selectedDistrict.districtNumber,
       section: selectedSection.value,
+      firstName: fields.name.toUpperCase(),
+      lastName: fields.lastName.toUpperCase(),
+      middleName: fields.middleName.toUpperCase(),
       address: fields.location.label.toUpperCase(),
       phoneNumber: fields.phoneNumber ? fields.phoneNumber.slice(3) : undefined,
       peopleVoting: fields.peopleVoting,
@@ -60,11 +109,10 @@ const RegistrarPromovido = () => {
       ancestor: userInfo.identifier,
       jwt: user.signInUserSession.idToken.jwtToken,
       ine: fields.electorIdentifier,
+      inePicture: ineURL,
     };
 
     try {
-      setIsLoading(true);
-
       await createLead(led);
       reset({
         municipality: municipalities[0],
@@ -74,6 +122,10 @@ const RegistrarPromovido = () => {
         location: '',
         electorIdentifier: '',
         peopleVoting: '',
+        name: '',
+        lastName: '',
+        middleName: '',
+        inePicture: '',
       });
       setIsLoading(false);
       toast.success('Promovido agregado correctamente!', {
@@ -217,6 +269,16 @@ const RegistrarPromovido = () => {
     }
   };
 
+  const isValidName = (name) => {
+    const regex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
+    return regex.test(name);
+  };
+
+  const isValidLastName = (name) => {
+    const regex = /[a-zA-Z]+$/;
+    return regex.test(name);
+  };
+
   if (hasErrors) {
     return (
       <div className='h-screen flex justify-center'>
@@ -348,6 +410,86 @@ const RegistrarPromovido = () => {
               )}
 
               <div className='mt-4'>
+                <label className='text-gray-600 font-medium'>
+                  Nombre(s) <span className='text-red-600'>*</span>
+                </label>
+                <input
+                  className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700 uppercase'
+                  name='name'
+                  {...register('name', { required: true, maxLength: 50, validate: isValidName })}
+                />
+                {errors?.name?.type === 'required' && (
+                  <div className='mb-3 text-normal text-red-500'>Favor de ingresar un nombre</div>
+                )}
+                {errors?.name?.type === 'maxLength' && (
+                  <div className='mb-3 text-normal text-red-500'>
+                    Nombre muy largo, favor de ingresar uno más corto
+                  </div>
+                )}
+                {errors?.name?.type === 'validate' && (
+                  <div className='mb-3 text-normal text-red-500'>
+                    Formato incorrecto, favor de verificar carácteres y espacios
+                  </div>
+                )}
+              </div>
+
+              <div className='mt-4'>
+                <label className='text-gray-600 font-medium'>
+                  Apellido paterno <span className='text-red-600'>*</span>
+                </label>
+                <input
+                  className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700 uppercase'
+                  name='lastName'
+                  {...register('lastName', {
+                    required: true,
+                    maxLength: 50,
+                    validate: isValidLastName,
+                  })}
+                />
+                {errors?.lastName?.type === 'required' && (
+                  <div className='mb-3 text-normal text-red-500'>Favor de ingresar un apellido</div>
+                )}
+                {errors?.lastName?.type === 'maxLength' && (
+                  <div className='mb-3 text-normal text-red-500'>
+                    Apellido muy largo, favor de ingresar uno más corto
+                  </div>
+                )}
+                {errors?.lastName?.type === 'validate' && (
+                  <div className='mb-3 text-normal text-red-500'>
+                    Formato incorrecto, favor de verificar carácteres y espacios
+                  </div>
+                )}
+              </div>
+
+              <div className='mt-4'>
+                <label className='text-gray-600 font-medium'>
+                  Apellido materno <span className='text-red-600'>*</span>
+                </label>
+                <input
+                  className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700 uppercase'
+                  name='middleName'
+                  {...register('middleName', {
+                    required: true,
+                    maxLength: 50,
+                    validate: isValidLastName,
+                  })}
+                />
+                {errors?.middleName?.type === 'required' && (
+                  <div className='mb-3 text-normal text-red-500'>Favor de ingresar un apellido</div>
+                )}
+                {errors?.middleName?.type === 'maxLength' && (
+                  <div className='mb-3 text-normal text-red-500'>
+                    Apellido muy largo, favor de ingresar uno más corto
+                  </div>
+                )}
+                {errors?.middleName?.type === 'validate' && (
+                  <div className='mb-3 text-normal text-red-500'>
+                    Formato incorrecto, favor de verificar carácteres y espacios
+                  </div>
+                )}
+              </div>
+
+              <div className='mt-4'>
                 <label htmlFor='phoneNumber' className='text-gray-600 font-medium'>
                   Teléfono <span className='text-red-600 text-xs'>(Opcional)</span>
                 </label>
@@ -399,7 +541,36 @@ const RegistrarPromovido = () => {
                 <div className='mb-3 text-normal text-red-500'>Favor de ingresar una dirección</div>
               )}
 
-              <div className='mt-4'>
+              <div className='mt-4 flex flex-col'>
+                <label className='text-gray-600 font-medium'>
+                  Foto INE <span className='text-red-600 text-xs'>(Opcional)</span>
+                </label>
+                <input
+                  {...register('inePicture', {
+                    validate: {
+                      lessThan10MB: (files) => {
+                        if (files[0]) {
+                          if (files[0]?.size > 10000000) {
+                            return 'Tamaño máximo permitido por imagen es de 10 MB';
+                          }
+                          if (!['image/jpeg', 'image/png', 'image/heic'].includes(files[0]?.type)) {
+                            return 'Solamente puedes subir imágenes en formato PNG, JPEG o HEIC';
+                          }
+                          return true;
+                        }
+                        return true;
+                      },
+                    },
+                  })}
+                  type='file'
+                />
+              </div>
+
+              {errors.inePicture && (
+                <div className='mb-3 text-normal text-red-500'>{errors.inePicture.message}</div>
+              )}
+
+              <div className='mt-6'>
                 <label className='text-gray-600 font-medium'>
                   Clave de Elector <span className='text-red-600 text-xs'>(Opcional)</span>
                 </label>

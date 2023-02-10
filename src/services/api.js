@@ -84,7 +84,6 @@ export const createAncestor = async (ancestor) => {
         email: ancestor.attributes.email,
         role: ancestor.attributes['custom:role'],
         ancestor: ancestor.attributes['custom:ancestorId'] || '',
-        identifier: Math.floor(Math.random() * 9000 + 1000),
       },
       {
         headers: {

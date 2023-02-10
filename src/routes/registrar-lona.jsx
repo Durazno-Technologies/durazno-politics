@@ -103,7 +103,6 @@ const RegistrarLona = () => {
           };
 
           await createLead(led);
-          console.log('este se debe imprimir primero LOLLL');
 
           reset({
             district: districts[0],
@@ -111,10 +110,11 @@ const RegistrarLona = () => {
             phoneNumber: '',
             location: '',
             electorIdentifier: '',
+            inePicture: '',
+            lonaPicture: '',
           });
 
           setIsLoading(false);
-          console.log('este se debe imprimir tambien');
           toast.success('Lona agregada correctamente!', {
             position: 'top-right',
             autoClose: 5000,
@@ -468,8 +468,8 @@ const RegistrarLona = () => {
                         files[0]?.size < 10000000 ||
                         'Tamaño máximo permitido por imagen es de 10 MB',
                       acceptedFormats: (files) =>
-                        ['image/jpeg', 'image/png'].includes(files[0]?.type) ||
-                        'Solamente puedes subir imágenes en formato PNG o JPEG',
+                        ['image/jpeg', 'image/png', 'image/heic'].includes(files[0]?.type) ||
+                        'Solamente puedes subir imágenes en formato PNG, JPEG o HEIC',
                     },
                   })}
                   type='file'
@@ -495,8 +495,8 @@ const RegistrarLona = () => {
                         files[0]?.size < 10000000 ||
                         'Tamaño máximo permitido por imagen es de 10 MB',
                       acceptedFormats: (files) =>
-                        ['image/jpeg', 'image/png'].includes(files[0]?.type) ||
-                        'Solamente puedes subir imágenes en formato PNG o JPEG',
+                        ['image/jpeg', 'image/png', 'image/heic'].includes(files[0]?.type) ||
+                        'Solamente puedes subir imágenes en formato PNG, JPEG o HEIC',
                     },
                   })}
                   type='file'
