@@ -269,16 +269,6 @@ const RegistrarPromovido = () => {
     }
   };
 
-  const isValidName = (name) => {
-    const regex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
-    return regex.test(name);
-  };
-
-  const isValidLastName = (name) => {
-    const regex = /[a-zA-Z]+$/;
-    return regex.test(name);
-  };
-
   if (hasErrors) {
     return (
       <div className='h-screen flex justify-center'>
@@ -416,7 +406,7 @@ const RegistrarPromovido = () => {
                 <input
                   className='border-solid border-gray-300 border p-2  w-full rounded text-gray-700 uppercase'
                   name='name'
-                  {...register('name', { required: true, maxLength: 50, validate: isValidName })}
+                  {...register('name', { required: true, maxLength: 50 })}
                 />
                 {errors?.name?.type === 'required' && (
                   <div className='mb-3 text-normal text-red-500'>Favor de ingresar un nombre</div>
@@ -424,11 +414,6 @@ const RegistrarPromovido = () => {
                 {errors?.name?.type === 'maxLength' && (
                   <div className='mb-3 text-normal text-red-500'>
                     Nombre muy largo, favor de ingresar uno más corto
-                  </div>
-                )}
-                {errors?.name?.type === 'validate' && (
-                  <div className='mb-3 text-normal text-red-500'>
-                    Formato incorrecto, favor de verificar carácteres y espacios
                   </div>
                 )}
               </div>
@@ -443,7 +428,6 @@ const RegistrarPromovido = () => {
                   {...register('lastName', {
                     required: true,
                     maxLength: 50,
-                    validate: isValidLastName,
                   })}
                 />
                 {errors?.lastName?.type === 'required' && (
@@ -452,11 +436,6 @@ const RegistrarPromovido = () => {
                 {errors?.lastName?.type === 'maxLength' && (
                   <div className='mb-3 text-normal text-red-500'>
                     Apellido muy largo, favor de ingresar uno más corto
-                  </div>
-                )}
-                {errors?.lastName?.type === 'validate' && (
-                  <div className='mb-3 text-normal text-red-500'>
-                    Formato incorrecto, favor de verificar carácteres y espacios
                   </div>
                 )}
               </div>
@@ -471,7 +450,6 @@ const RegistrarPromovido = () => {
                   {...register('middleName', {
                     required: true,
                     maxLength: 50,
-                    validate: isValidLastName,
                   })}
                 />
                 {errors?.middleName?.type === 'required' && (
@@ -480,11 +458,6 @@ const RegistrarPromovido = () => {
                 {errors?.middleName?.type === 'maxLength' && (
                   <div className='mb-3 text-normal text-red-500'>
                     Apellido muy largo, favor de ingresar uno más corto
-                  </div>
-                )}
-                {errors?.middleName?.type === 'validate' && (
-                  <div className='mb-3 text-normal text-red-500'>
-                    Formato incorrecto, favor de verificar carácteres y espacios
                   </div>
                 )}
               </div>
